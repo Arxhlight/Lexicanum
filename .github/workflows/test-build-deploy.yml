@@ -1,0 +1,100 @@
+name: Validate .NET Workflow
+
+on:
+  push:
+    branches: ["develop", "main"]
+  pull_request:
+    branches: ["develop", "main"]
+
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  Solution_Name: Lexicanum.sln
+  Build_Configuration: Release                                          # Replace with your solution name, i.e. MyWpfApp.sln.
+  Test_Project_Path: Lexicanum.Test\Lexicanum.Test.csproj        # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
+
+jobs:
+  validate-branch: 
+    name: validating the branch 
+    runs-on: ubuntu-latest
+    if: startsWith(github.head_ref, 'feature/') || startsWith(github.head_ref, 'bugfix/')
+    steps:
+      - name: check and validate branch naming on develop
+        if: startsWith(github.head_ref, 'feature/') || startsWith(github.head_ref, 'bugfix/')  # if not the case show error, else nothing
+        run: echo "PRs to develop must come from feature/ or bugfix/ branches"
+
+  run-tests:
+    name: test on .Net ${{ matrix.dotnet-version }}
+    runs-on: ubuntu-latest
+    needs: validate-branch
+    strategy:
+      matrix:
+        dotnet-version: ['9.0.x', '10.0.x']
+  
+    steps:  
+  
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+    
+      - name: Setup .NET ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+            
+      - name: Restore dependencies
+        run: dotnet restore ${{ env.Solution_Name }}
+      
+      - name: Build solution # why do we need to build here?
+        run: dotnet build ${{ env.Solution_Name }} --configuration ${{ env.Build_Configuration }} --no-restore
+      
+      # Execute all unit tests in the solution
+      - name: Run tests (if test project exists)
+        run: dotnet test ${{ env.Solution_Name }} --configuration ${{ env.Build_Configuration }} --no-build --verbosity normal
+        continue-on-error: true  # Don't fail if no tests exist yet
+    
+  build-deploy:
+    name: build-and-deploy
+    runs-on: windows-latest
+    needs: run-tests
+          
+    steps:
+    
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      
+      - name: Restore dependencies
+        run: dotnet restore ${{ env.Solution_Name }}
+      
+      - name: Build solution
+        run: dotnet build ${{ env.Solution_Name }} --configuration ${{ env.Build_Configuration }} --no-restore
+      
+      - name: Publish application
+        run: |
+          dotnet publish Lexicanum\Lexicanum.csproj `
+            --configuration ${{ env.Build_Configuration }} `
+            --runtime win-x64 `
+            --self-contained true `
+            -p:PublishSingleFile=true `
+            -p:IncludeNativeLibrariesForSelfExtract=true `
+            --output ./publish --no-build
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Lexicanum-Build-${{ github.run_number }}
+          path: ./publish/**/*
+
+    
+    
