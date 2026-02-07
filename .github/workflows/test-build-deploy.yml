@@ -20,11 +20,12 @@ jobs:
   validate-branch: 
     name: validating the branch 
     runs-on: ubuntu-latest
-    if: startsWith(github.head_ref, 'feature/') || startsWith(github.head_ref, 'bugfix/')
     steps:
       - name: check and validate branch naming on develop
         if: startsWith(github.head_ref, 'feature/') || startsWith(github.head_ref, 'bugfix/')  # if not the case show error, else nothing
         run: echo "PRs to develop must come from feature/ or bugfix/ branches"
+
+
 
   run-tests:
     name: test on .Net ${{ matrix.dotnet-version }}
