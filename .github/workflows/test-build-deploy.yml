@@ -31,7 +31,7 @@ jobs:
      - name: Skip message
        if: "!startsWith(github.head_ref, 'feature/') && !startsWith(github.head_ref, 'bugfix/')"
        run: |
-         echo "::notice::Validate Branch Rules: Fail - only feature/ or bugfix/ syntax acepted as branch names"
+         echo "::notice::Validate Branch Rules: Fail - only feature/ or bugfix/ syntax acepted as branch names, run-tests, build-deploy canceled"
        
   run-tests:
     name: run-tests
