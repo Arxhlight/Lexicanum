@@ -86,7 +86,7 @@ jobs:
         run: dotnet restore ${{ env.Solution_Name }} --runtime win-x64
       
       - name: Build solution  # --no-restore  “I guarantee restore has already been run with compatible settings.”
-        run: dotnet build ${{ env.Solution_Name }} --configuration ${{ env.Build_Configuration }} --no-restore  
+        run: dotnet build ${{ env.Solution_Name }} --configuration ${{ env.Build_Configuration }} --runtime win-x64 --no-restore  
       
       - name: Publish application  # --no-build  “I guarantee build has already been run with compatible settings.”
         run: |
