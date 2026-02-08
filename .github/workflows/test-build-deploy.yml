@@ -17,23 +17,30 @@ env:
   Test_Project_Path: Lexicanum.Test\Lexicanum.Test.csproj        # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
 
 jobs:
-  validate-branch: 
-    name: validating the branch 
+  validate-branch-names: 
+    name: throw msg
     runs-on: ubuntu-latest
     steps:
-      - name: check and validate branch naming on develop
-        if: startsWith(github.head_ref, 'feature/') || startsWith(github.head_ref, 'bugfix/')  # if not the case show error, else nothing
-        run: echo "PRs to develop must come from feature/ or bugfix/ branches"
-
-
-
+     - name: Feature/bugfix branch message
+       if: |
+        startsWith(github.head_ref || github.ref_name, 'feature/') ||
+        startsWith(github.head_ref || github.ref_name, 'bugfix/')
+       run: |
+         echo "Branch eligible for feature checks"
+  
+     - name: Skip message
+       if: "!startsWith(github.head_ref, 'feature/') && !startsWith(github.head_ref, 'bugfix/')"
+       run: |
+         echo "::notice::Skipping deploy-preview: only feature/ or bugfix/ branches deploy previews"
+       
   run-tests:
-    name: test on .Net ${{ matrix.dotnet-version }}
-    runs-on: ubuntu-latest
-    needs: validate-branch
-    strategy:
-      matrix:
-        dotnet-version: ['9.0.x', '10.0.x']
+    name: test on .Net 
+    runs-on: windows-latest
+    needs: validate-branch-names
+    if: |
+        startsWith(github.head_ref || github.ref_name, 'feature/') ||
+        startsWith(github.head_ref || github.ref_name, 'bugfix/')
+   
   
     steps:  
   
@@ -42,15 +49,15 @@ jobs:
         with:
           fetch-depth: 0
     
-      - name: Setup .NET ${{ matrix.dotnet-version }}
+      - name: Setup .NET 
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: ${{ matrix.dotnet-version }}
+          dotnet-version: '10.0.x'
             
       - name: Restore dependencies
         run: dotnet restore ${{ env.Solution_Name }}
       
-      - name: Build solution # why do we need to build here?
+      - name: Build solution 
         run: dotnet build ${{ env.Solution_Name }} --configuration ${{ env.Build_Configuration }} --no-restore
       
       # Execute all unit tests in the solution
@@ -76,12 +83,12 @@ jobs:
           dotnet-version: '10.0.x'
       
       - name: Restore dependencies
-        run: dotnet restore ${{ env.Solution_Name }}
+        run: dotnet restore ${{ env.Solution_Name }} --runtime win-x64
       
-      - name: Build solution
-        run: dotnet build ${{ env.Solution_Name }} --configuration ${{ env.Build_Configuration }} --no-restore
+      - name: Build solution  # --no-restore  “I guarantee restore has already been run with compatible settings.”
+        run: dotnet build ${{ env.Solution_Name }} --configuration ${{ env.Build_Configuration }} --no-restore  
       
-      - name: Publish application
+      - name: Publish application  # --no-build  “I guarantee build has already been run with compatible settings.”
         run: |
           dotnet publish Lexicanum\Lexicanum.csproj `
             --configuration ${{ env.Build_Configuration }} `
@@ -89,7 +96,7 @@ jobs:
             --self-contained true `
             -p:PublishSingleFile=true `
             -p:IncludeNativeLibrariesForSelfExtract=true `
-            --output ./publish --no-build
+            --output ./publish --no-build  
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
