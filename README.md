@@ -63,6 +63,10 @@ dotnet run --project Lexicanum
 ## Development
 
 ### Contributing
+Contributors must start on the `develop` branch.
+PRs should be made against the `develop` branch.
+Use `feature/yoursignature/explanation` as the branch name.
+anu branch not using the `feature/` prefix will be rejected by the CI pipeline.
 
 Contributions are welcome! Feel free to:
 - Add new quiz questions
