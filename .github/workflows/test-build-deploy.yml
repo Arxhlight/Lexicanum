@@ -1,4 +1,4 @@
-name: Validate .NET Workflow
+name: Test, Build, Deploy
 
 on:
   push:
@@ -17,8 +17,8 @@ env:
   Test_Project_Path: Lexicanum.Test\Lexicanum.Test.csproj        # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
 
 jobs:
-  validate-branch-names: 
-    name: throw msg
+  validate-branch-rules: 
+    name: validate-branch-rules
     runs-on: ubuntu-latest
     steps:
      - name: Feature/bugfix branch message
@@ -26,17 +26,17 @@ jobs:
         startsWith(github.head_ref || github.ref_name, 'feature/') ||
         startsWith(github.head_ref || github.ref_name, 'bugfix/')
        run: |
-         echo "Branch eligible for feature checks"
+         echo "::notice::Validate Branch Rules: Sucess - continue to run tests"
   
      - name: Skip message
        if: "!startsWith(github.head_ref, 'feature/') && !startsWith(github.head_ref, 'bugfix/')"
        run: |
-         echo "::notice::Skipping deploy-preview: only feature/ or bugfix/ branches deploy previews"
+         echo "::notice::Validate Branch Rules: Fail - only feature/ or bugfix/ syntax acepted as branch names"
        
   run-tests:
-    name: test on .Net 
+    name: run-tests
     runs-on: windows-latest
-    needs: validate-branch-names
+    needs: validate-branch-rules
     if: |
         startsWith(github.head_ref || github.ref_name, 'feature/') ||
         startsWith(github.head_ref || github.ref_name, 'bugfix/')
