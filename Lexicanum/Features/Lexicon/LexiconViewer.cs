@@ -423,23 +423,59 @@ git fetch origin             # Update references from origin remote
 
 Manage Git submodules.
 
+## Cloning with Submodules
+```
+git clone --recurse-submodules <repo-url>   # Clone repo and all submodules
+```
+
+## Initialize After Clone
+If you already cloned without --recurse-submodules:
+```
+git submodule update --init --recursive     # Initialize all submodules
+```
+
 ## Add Submodule
 ```
 git submodule add <repo-url> <path>        # Add submodule to repository
+git submodule add -b <branch> <repo> <path> # Add submodule tracking specific branch
 ```
 
-## Status & Update
+## Initialize & Update
 ```
+git submodule init                         # Initialize submodules from .gitmodules
 git submodule status                       # Show submodule commit status
 git submodule update                       # Checkout recorded commit
 git submodule update --init                # Clone and initialize submodules
 git submodule update --init --recursive    # Initialize nested submodules
+git submodule update --remote              # Update to latest commit from remote
+```
+
+## Remove Submodule
+```
+git submodule deinit <path>                # Remove submodule working tree
+git submodule deinit -f <path>             # Force remove (discard local changes)
+git rm <path>                              # Remove submodule from repository
+```
+
+## Batch Operations
+```
+git submodule foreach '<command>'          # Run command in each submodule
+git submodule foreach --recursive '<cmd>'  # Run in all nested submodules
+git submodule sync                         # Sync URLs from .gitmodules
+git submodule sync --recursive             # Sync all nested submodules
+```
+
+## Configuration
+```
+git submodule set-branch --branch <branch> <path>  # Change tracked branch
+git submodule set-branch --default <path>  # Use default branch
+git submodule set-url <path> <newurl>      # Change submodule URL
 ```
 
 ## Commands in Submodule
 ```
 git -C <path> status                       # Run git command in submodule directory
-git -C <path> commit -m ""msg""              # Commit inside submodule
+git -C <path> commit -m \""msg\""              # Commit inside submodule
 git -C <path> lfs fetch                    # Fetch LFS files in submodule
 ```
 ";
