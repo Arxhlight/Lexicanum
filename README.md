@@ -36,16 +36,19 @@ commands, terminal operations, programming fundamentals, and more.
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/Lexicanum.git
+git clone https://github.com/Arxhlight/Lexicanum.git
 
 # Navigate to the project
 cd Lexicanum
 
-# Build the project
+# Build the solution
 dotnet build
 
+# Run the tests
+dotnet test
+
 # Run the application
-dotnet run --project Lexicanum
+dotnet run --project src/Lexicanum
 ```
 
 ## Usage
@@ -62,12 +65,18 @@ dotnet run --project Lexicanum
 
 ## Development
 
+Read [CLAUDE.md](CLAUDE.md) (enforced rules, each with its source) and
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) (principles, layer map, how to add a feature) before contributing.
+
 ### Contributing
 >- Contributors must create new branch on `develop`.
 >- PRs should be made against the `develop` branch.
 >- Branches should be named using the following format:  `feature/` or `bugfix/`.
 >- Example: `feature/yoursignature/explanation` as the branch name.
->- any branch not using the `feature/` or `bugfix/` prefix will be rejected by the CI pipeline.
+
+Every PR is gated by CI: `dotnet format --verify-no-changes`, an analyzer-enforced build with
+warnings as errors, and the contract test suites. Merges to `main` automatically publish the
+single-file `Lexicanum.exe` artifact.
 
 Contributions are welcome! Feel free to:
 - Add new quiz questions
@@ -77,10 +86,9 @@ Contributions are welcome! Feel free to:
 
 ### Adding New Content
 
-To add a new quiz or lexicon entry, simply modify the relevant feature file in `Features/`. The architecture supports:
-- Nested subcategories (unlimited depth)
-- Custom execution handlers
-- Multiple content types
+Content is data: add a JSON file under `src/Lexicanum/Content/{lexicon,quizzes,exercises}/`.
+It is embedded into the executable, validated at startup, appears in the menu automatically,
+and is covered by `ContentContractTests` without writing any code.
 
 
 ## License
