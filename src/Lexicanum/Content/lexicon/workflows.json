@@ -1,0 +1,36 @@
+{
+    "category":  "Common Workflows",
+    "description":  "Step-by-step workflow guides",
+    "items":  [
+                  {
+                      "id":  "feature-branch-workflow",
+                      "title":  "Feature Branch Workflow",
+                      "description":  "Create branch, commit, push",
+                      "body":  "## Feature Branch Workflow\n\nCreate Branch → Commit → Push\n\n## Steps\n```\ngit checkout -b \u003cbranch\u003e     # 1. Create and switch to new branch\ngit add \u003cfile\u003e               # 2. Stage changes\ngit commit -m \"message\"      # 3. Create commit\ngit push -u origin \u003cbranch\u003e  # 4. Push and set upstream\n```\n\n## Example\n```\ngit checkout -b feature/login-page\ngit add src/login.cs\ngit commit -m \"Add login page component\"\ngit push -u origin feature/login-page\n```"
+                  },
+                  {
+                      "id":  "quick-commit-workflow",
+                      "title":  "Quick Commit Workflow",
+                      "description":  "Stage all and push",
+                      "body":  "## Quick Commit Workflow\n\nCommit All Changes → Push\n\n## Steps\n```\ngit add .                    # 1. Stage all changes\ngit commit -m \"message\"      # 2. Create commit\ngit push origin \u003cbranch\u003e     # 3. Push to remote\n```\n\n## Example\n```\ngit add .\ngit commit -m \"Fix bug in user validation\"\ngit push origin main\n```"
+                  },
+                  {
+                      "id":  "add-submodule-workflow",
+                      "title":  "Add Submodule Workflow",
+                      "description":  "Add and manage submodules",
+                      "body":  "## Add Submodule Workflow\n\nAdd a submodule to your repository.\n\n## Steps\n```\ngit submodule add \u003curl\u003e \u003cpath\u003e  # 1. Register submodule\ngit commit -m \"Add submodule\"   # 2. Save submodule reference\ngit push origin \u003cbranch\u003e        # 3. Push changes\n```\n\n## Example\n```\ngit submodule add https://github.com/lib/utils.git external/utils\ngit commit -m \"Add utils library as submodule\"\ngit push origin main\n```"
+                  },
+                  {
+                      "id":  "rebase-feature-workflow",
+                      "title":  "Rebase Feature Workflow",
+                      "description":  "Rebase feature onto main",
+                      "body":  "## Rebase Feature onto Main\n\nUpdate your feature branch with latest main.\n\n## Steps\n```\ngit checkout \u003cfeature\u003e       # 1. Switch to feature branch\ngit fetch origin             # 2. Update remote references\ngit rebase origin/main       # 3. Rebase onto latest main\ngit push --force-with-lease  # 4. Update remote (if needed)\n```\n\n## Example\n```\ngit checkout feature/login-page\ngit fetch origin\ngit rebase origin/main\ngit push --force-with-lease\n```\n\n⚠️ Only force push if you\u0027re the only one working on the branch!"
+                  },
+                  {
+                      "id":  "unstage-files-safely",
+                      "title":  "Unstage Files Safely",
+                      "description":  "Safely unstage files",
+                      "body":  "## Unstage Files Safely\n\nRemove files from staging without losing changes.\n\n## Unstage All Files\n```\ngit restore --staged .       # Unstage all files\n```\n\n## Unstage Specific File\n```\ngit restore --staged \u003cfile\u003e  # Unstage specific file\n```\n\n## Example\n```\ngit add .\ngit restore --staged secrets.json  # Oops, don\u0027t commit this!\ngit commit -m \"Add new features\"\n```"
+                  }
+              ]
+}

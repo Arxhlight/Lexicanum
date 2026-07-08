@@ -1,3 +1,4 @@
+using Lexicanum.Core.Content;
 using Lexicanum.Core.Services;
 using Lexicanum.Navigation;
 using Lexicanum.UI;
@@ -109,50 +110,13 @@ public sealed class QuizScreen : IScreen
         console.WaitForKey();
     }
 
-    private static readonly List<QuizQuestion> GitQuizQuestions = new()
+    public static MenuNode CreateMenuNode(IReadOnlyList<ContentPack<QuizQuestion>> quizPacks, ScoreService scoreService)
     {
-        new QuizQuestion(
-            "What command is used to create a new Git repository?",
-            new[] { "git new", "git init", "git create", "git start" },
-            1,
-            "git init initializes a new Git repository in the current directory."
-        ),
-        new QuizQuestion(
-            "Which command stages all changes for commit?",
-            new[] { "git commit -a", "git add .", "git stage all", "git push" },
-            1,
-            "git add . stages all changes in the current directory and subdirectories."
-        ),
-        new QuizQuestion(
-            "How do you create and switch to a new branch in one command?",
-            new[] { "git branch new-branch", "git switch new-branch", "git checkout -b new-branch", "git new-branch" },
-            2,
-            "git checkout -b creates a new branch and switches to it. Modern alternative: git switch -c"
-        )
-    };
+        var quizLeaves = quizPacks
+            .Select(pack => MenuNode.Leaf(pack.Category, pack.Description,
+                () => new QuizScreen(pack.Category, pack.Items, scoreService)))
+            .ToArray();
 
-    private static readonly List<QuizQuestion> ProgrammingQuizQuestions = new()
-    {
-        new QuizQuestion(
-            "What does OOP stand for?",
-            new[] { "Object-Oriented Programming", "Open-Oriented Protocol", "Objective Operation Process", "Optional Object Pattern" },
-            0,
-            "OOP stands for Object-Oriented Programming, a programming paradigm based on objects."
-        ),
-        new QuizQuestion(
-            "What is the time complexity of accessing an element in an array by index?",
-            new[] { "O(n)", "O(log n)", "O(1)", "O(n²)" },
-            2,
-            "Array access by index is O(1) - constant time, as it's a direct memory offset calculation."
-        )
-    };
-
-    public static MenuNode CreateMenuNode(ScoreService scoreService)
-    {
-        return MenuNode.Branch("Quizlet", "Test your knowledge with quizzes",
-            MenuNode.Leaf("Git Quiz", "Test your Git knowledge",
-                () => new QuizScreen("Git Fundamentals", GitQuizQuestions, scoreService)),
-            MenuNode.Leaf("Programming Basics Quiz", "Test your programming fundamentals",
-                () => new QuizScreen("Programming Fundamentals", ProgrammingQuizQuestions, scoreService)));
+        return MenuNode.Branch("Quizlet", "Test your knowledge with quizzes", quizLeaves);
     }
 }

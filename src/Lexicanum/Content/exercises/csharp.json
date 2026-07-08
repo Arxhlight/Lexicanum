@@ -1,0 +1,31 @@
+{
+  "category": "C#",
+  "description": "Practice C# syntax and patterns",
+  "items": [
+    {
+      "id": "csharp-foreach",
+      "name": "Foreach Loop",
+      "description": "Write a foreach loop that iterates over a list with any name.",
+      "correctExample": "foreach (var item in myList)\n{\n    // code here\n}",
+      "answerPattern": "foreach\\s*\\(\\s*var\\s+\\w+\\s+in\\s+\\w+\\s*\\)",
+      "feedback": "Syntax: foreach (var item in collection) - don't forget the 'var', 'in', and parentheses.",
+      "successFeedback": "Tip: always include curly braces, even for one-line bodies."
+    },
+    {
+      "id": "csharp-for-loop",
+      "name": "For Loop",
+      "description": "Write a for loop that counts from 0 to 9.",
+      "correctExample": "for (int i = 0; i < 10; i++)\n{\n    // code here\n}",
+      "answerPattern": "for\\s*\\(\\s*(int|var)\\s+\\w+\\s*=\\s*0\\s*;\\s*\\w+\\s*<\\s*10\\s*;\\s*\\w+\\+\\+\\s*\\)",
+      "feedback": "Remember: initialization (int i = 0), condition (i < 10), and increment (i++)."
+    },
+    {
+      "id": "csharp-if-statement",
+      "name": "If Statement",
+      "description": "Write an if statement that checks if a variable 'x' is greater than 5.",
+      "correctExample": "if (x > 5)\n{\n    // code here\n}",
+      "answerPattern": "if\\s*\\(\\s*\\w+\\s*>\\s*5\\s*\\)",
+      "feedback": "Syntax: if (variable > 5)"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "category": "Python",
+  "description": "Practice Python syntax and patterns",
+  "items": [
+    {
+      "id": "python-for-loop",
+      "name": "For Loop",
+      "description": "Write a for loop that iterates over a list.",
+      "correctExample": "for item in my_list:\n    # code here",
+      "answerPattern": "for\\s+\\w+\\s+in\\s+\\w+:",
+      "feedback": "Syntax: for item in list:"
+    },
+    {
+      "id": "python-list-comprehension",
+      "name": "List Comprehension",
+      "description": "Write a list comprehension that creates a list of squares from 0-9.",
+      "correctExample": "squares = [x**2 for x in range(10)]",
+      "answerPattern": "\\w+\\s*=\\s*\\[\\s*\\w+\\*\\*2\\s+for\\s+\\w+\\s+in\\s+range\\s*\\(\\s*10\\s*\\)\\s*\\]",
+      "feedback": "Syntax: [x**2 for x in range(10)]"
+    }
+  ]
+}

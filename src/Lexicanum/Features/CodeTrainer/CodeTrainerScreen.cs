@@ -1,5 +1,5 @@
+using Lexicanum.Core.Content;
 using Lexicanum.Core.Services;
-using Lexicanum.Features.CodeTrainer.Languages;
 using Lexicanum.Navigation;
 using Lexicanum.UI;
 using Spectre.Console;
@@ -7,7 +7,7 @@ using Spectre.Console;
 namespace Lexicanum.Features.CodeTrainer;
 
 /// <summary>
-/// Runs a live-coding session for one language: the player types code for each
+/// Runs a live-coding session for one language pack: the player types code for each
 /// exercise, gets it validated, and optionally plays hardmode (one mistake ends the run).
 /// </summary>
 public sealed class CodeTrainerScreen : IScreen
@@ -15,14 +15,14 @@ public sealed class CodeTrainerScreen : IScreen
     private const string FeatureName = "CodeTraining";
     private const int PointsPerCorrectAnswer = 100;
 
-    private readonly ProgrammingLanguage _language;
+    private readonly ContentPack<CodeExercise> _pack;
     private readonly ScoreService _scoreService;
 
-    public string Title => $"Live Code Training - {_language.Name}";
+    public string Title => $"Live Code Training - {_pack.Category}";
 
-    public CodeTrainerScreen(ProgrammingLanguage language, ScoreService scoreService)
+    public CodeTrainerScreen(ContentPack<CodeExercise> pack, ScoreService scoreService)
     {
-        _language = language;
+        _pack = pack;
         _scoreService = scoreService;
     }
 
@@ -39,15 +39,14 @@ public sealed class CodeTrainerScreen : IScreen
             : "Playing it safe, I see. Typical.");
         console.WaitForKey();
 
-        foreach (var exercise in _language.GetExercises())
+        foreach (var exercise in _pack.Items)
         {
             if (hardmodeOver)
             {
                 break;
             }
 
-            var earned = RunExercise(console, exercise, hardmode, out hardmodeOver);
-            sessionScore += earned;
+            sessionScore += RunExercise(console, exercise, hardmode, out hardmodeOver);
         }
 
         ShowSessionResults(console, sessionScore, hardmodeOver);
@@ -66,18 +65,17 @@ public sealed class CodeTrainerScreen : IScreen
         console.WriteLine();
 
         var userCode = console.ReadMultilineInput();
-        var result = exercise.Validate(userCode);
 
         console.WriteLine();
 
-        if (result.IsCorrect)
+        if (CodeAnswerValidator.IsCorrect(exercise, userCode))
         {
             _scoreService.AddScore(FeatureName, PointsPerCorrectAnswer);
             console.ShowSuccess("Correct! ...I suppose even you can get lucky sometimes.");
 
-            if (!string.IsNullOrEmpty(result.Feedback))
+            if (!string.IsNullOrEmpty(exercise.SuccessFeedback))
             {
-                console.ShowInfo(result.Feedback);
+                console.ShowInfo(exercise.SuccessFeedback);
             }
 
             console.WaitForKey();
@@ -94,11 +92,7 @@ public sealed class CodeTrainerScreen : IScreen
             console.ShowError("Wrong! Study more, code less... or maybe code more, I don't know.");
         }
 
-        if (!string.IsNullOrEmpty(result.Feedback))
-        {
-            console.ShowInfo(result.Feedback);
-        }
-
+        console.ShowInfo(exercise.Feedback);
         ShowCorrectAnswer(console, exercise, userCode);
 
         if (!hardmodeOver)
@@ -161,16 +155,13 @@ public sealed class CodeTrainerScreen : IScreen
         console.WaitForKey();
     }
 
-    public static MenuNode CreateMenuNode(ScoreService scoreService)
+    public static MenuNode CreateMenuNode(IReadOnlyList<ContentPack<CodeExercise>> exercisePacks, ScoreService scoreService)
     {
-        return MenuNode.Branch("Live Code Training", "Practice writing code in real-time",
-            MenuNode.Leaf("C#", "Practice C# syntax and patterns",
-                () => new CodeTrainerScreen(new CSharpLanguage(), scoreService)),
-            MenuNode.Leaf("C++", "Practice C++ syntax and patterns",
-                () => new CodeTrainerScreen(new CPlusPlusLanguage(), scoreService)),
-            MenuNode.Leaf("JavaScript", "Practice JavaScript syntax and patterns",
-                () => new CodeTrainerScreen(new JavaScriptLanguage(), scoreService)),
-            MenuNode.Leaf("Python", "Practice Python syntax and patterns",
-                () => new CodeTrainerScreen(new PythonLanguage(), scoreService)));
+        var languageLeaves = exercisePacks
+            .Select(pack => MenuNode.Leaf(pack.Category, pack.Description,
+                () => new CodeTrainerScreen(pack, scoreService)))
+            .ToArray();
+
+        return MenuNode.Branch("Live Code Training", "Practice writing code in real-time", languageLeaves);
     }
 }

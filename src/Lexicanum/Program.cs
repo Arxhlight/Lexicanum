@@ -1,3 +1,4 @@
+using Lexicanum.Core.Content;
 using Lexicanum.Core.Services;
 using Lexicanum.Features.CodeTrainer;
 using Lexicanum.Features.Lexicon;
@@ -14,13 +15,24 @@ internal sealed class Program
 {
     private static int Main()
     {
+        ApplicationContent content;
+        try
+        {
+            content = ApplicationContent.LoadAndValidate(new EmbeddedContentSource());
+        }
+        catch (ContentValidationException ex)
+        {
+            Console.Error.WriteLine(ex.Message);
+            return 2;
+        }
+
         if (Console.IsInputRedirected)
         {
             Console.Error.WriteLine("Lexicanum is an interactive application and requires a terminal.");
             return 1;
         }
 
-        var app = new LexicanumApp(AnsiConsole.Console);
+        var app = new LexicanumApp(AnsiConsole.Console, content);
 
         Console.CancelKeyPress += (_, eventArgs) =>
         {
@@ -34,17 +46,39 @@ internal sealed class Program
 }
 
 /// <summary>
-/// The composition root: wires the console, services, and menu tree together
+/// All content the application ships with, loaded and validated once at startup.
+/// </summary>
+public sealed record ApplicationContent(
+    IReadOnlyList<ContentPack<LexiconEntry>> LexiconPacks,
+    IReadOnlyList<ContentPack<QuizQuestion>> QuizPacks,
+    IReadOnlyList<ContentPack<CodeExercise>> ExercisePacks)
+{
+    public static ApplicationContent LoadAndValidate(IContentSource source)
+    {
+        var lexiconPacks = source.LoadPacks<LexiconEntry>("lexicon");
+        var quizPacks = source.LoadPacks<QuizQuestion>("quizzes");
+        var exercisePacks = source.LoadPacks<CodeExercise>("exercises");
+
+        ContentValidator.Validate(lexiconPacks, quizPacks, exercisePacks);
+
+        return new ApplicationContent(lexiconPacks, quizPacks, exercisePacks);
+    }
+}
+
+/// <summary>
+/// The composition root: wires the console, services, content, and menu tree together
 /// and owns the application lifecycle (welcome, main loop, save, farewell).
 /// </summary>
 public class LexicanumApp
 {
     private readonly IAnsiConsole _console;
+    private readonly ApplicationContent _content;
     private readonly ScoreService _scoreService;
 
-    public LexicanumApp(IAnsiConsole console)
+    public LexicanumApp(IAnsiConsole console, ApplicationContent content)
     {
         _console = console;
+        _content = content;
         _scoreService = new ScoreService();
     }
 
@@ -55,9 +89,9 @@ public class LexicanumApp
         _scoreService.SetPlayerName(welcome.GetPlayerName());
 
         var rootMenu = MenuNode.Branch("LEXICANUM - Main Menu", null,
-            LexiconContent.CreateMenuNode(),
-            QuizScreen.CreateMenuNode(_scoreService),
-            CodeTrainerScreen.CreateMenuNode(_scoreService),
+            LexiconMenu.CreateMenuNode(_content.LexiconPacks),
+            QuizScreen.CreateMenuNode(_content.QuizPacks, _scoreService),
+            CodeTrainerScreen.CreateMenuNode(_content.ExercisePacks, _scoreService),
             ScoreboardScreen.CreateMenuNode(_scoreService));
 
         var navigator = new ScreenNavigator(_console);

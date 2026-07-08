@@ -1,0 +1,24 @@
+{
+    "category":  "Terminal Commands",
+    "description":  "Command line essentials",
+    "items":  [
+                  {
+                      "id":  "filesystem-navigation",
+                      "title":  "Filesystem Navigation",
+                      "description":  "Navigate and manage files",
+                      "body":  "## Filesystem Navigation\n\nEssential commands for navigating the filesystem.\n\n## List Files\n```\nls \u003cpath\u003e                    # List files in directory\nls -l \u003cpath\u003e                 # List files with detailed information\nls -la \u003cpath\u003e                # List all files including hidden ones\ndir                          # List files (Windows)\n```\n\n## Change Directory\n```\ncd \u003cpath\u003e                    # Change to specified directory\ncd ..                        # Move up one level\ncd ~                         # Move to home directory\ncd -                         # Move to previous directory\npwd                          # Print current working directory\n```\n\n## Create \u0026 Delete Directories\n```\nmkdir \u003cfolder\u003e               # Create new directory\nmkdir -p path/to/dir         # Create nested directories\nrm -rf \u003cfolder\u003e              # Delete folder and contents recursively\n```\n\n## View File Contents\n```\ncat \u003cfile\u003e                   # Display file contents\necho \"text\" \u003e \u003cfile\u003e         # Write text to file (overwrites)\n```"
+                  },
+                  {
+                      "id":  "file-operations",
+                      "title":  "File Operations",
+                      "description":  "Create, copy, move, and delete files",
+                      "body":  "## File Operations\n\nCommands for creating, copying, moving, and deleting files.\n\n## Create Files\n```\ntouch \u003cfilename\u003e             # Create empty file (Unix/Mac)\necho \"\" \u003e \u003cfilename\u003e         # Create empty file (cross-platform)\n```\n\n## Copy\n```\ncp \u003csource\u003e \u003cdest\u003e           # Copy file\ncp -r \u003csource\u003e \u003cdest\u003e        # Copy directory recursively\n```\n\n## Move/Rename\n```\nmv \u003csource\u003e \u003cdest\u003e           # Move or rename file/directory\n```\n\n## Delete\n```\nrm \u003cfile\u003e                    # Delete file\nrm -r \u003cdirectory\u003e            # Delete directory recursively\nrm -rf \u003cdirectory\u003e           # Force delete (no confirmation - careful!)\n```"
+                  },
+                  {
+                      "id":  "process-management",
+                      "title":  "Process Management",
+                      "description":  "Manage running processes",
+                      "body":  "## Process Management\n\nCommands for managing running processes.\n\n## View Processes\n```\nps                           # List processes\nps aux                       # Detailed process list (Unix/Mac)\ntop                          # Interactive process viewer\nhtop                         # Better interactive viewer (if installed)\n```\n\n## Kill Processes\n```\nkill \u003cPID\u003e                   # Terminate process by ID\nkill -9 \u003cPID\u003e                # Force kill process\nkillall \u003cname\u003e               # Kill all processes by name\n```\n\n## Background Jobs\n```\n\u003ccommand\u003e \u0026                  # Run command in background\njobs                         # List background jobs\nfg                           # Bring most recent job to foreground\nfg %\u003cjob-number\u003e             # Bring specific job to foreground\nbg                           # Continue paused job in background\nCtrl+Z                       # Pause current foreground process\n```"
+                  }
+              ]
+}

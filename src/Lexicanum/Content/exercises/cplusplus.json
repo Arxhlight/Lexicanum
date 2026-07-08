@@ -1,0 +1,38 @@
+{
+  "category": "C++",
+  "description": "Practice C++ syntax and patterns",
+  "items": [
+    {
+      "id": "cpp-for-loop",
+      "name": "For Loop",
+      "description": "Write a for loop that counts from 0 to 9.",
+      "correctExample": "for (int i = 0; i < 10; i++)\n{\n    // code here\n}",
+      "answerPattern": "for\\s*\\(\\s*int\\s+\\w+\\s*=\\s*0\\s*;\\s*\\w+\\s*<\\s*10\\s*;\\s*\\w+\\+\\+\\s*\\)",
+      "feedback": "Remember: initialization (int i = 0), condition (i < 10), and increment (i++)."
+    },
+    {
+      "id": "cpp-range-based-for",
+      "name": "Range-Based For Loop",
+      "description": "Write a range-based for loop that iterates over a vector.",
+      "correctExample": "for (auto item : myVector)\n{\n    // code here\n}",
+      "answerPattern": "for\\s*\\(\\s*(auto|int|const\\s+auto)\\s+\\w+\\s*:\\s*\\w+\\s*\\)",
+      "feedback": "Syntax: for (auto item : container)"
+    },
+    {
+      "id": "cpp-if-statement",
+      "name": "If Statement",
+      "description": "Write an if statement that checks if a variable 'x' is greater than 5.",
+      "correctExample": "if (x > 5)\n{\n    // code here\n}",
+      "answerPattern": "if\\s*\\(\\s*\\w+\\s*>\\s*5\\s*\\)",
+      "feedback": "Syntax: if (variable > 5)"
+    },
+    {
+      "id": "cpp-pointer-declaration",
+      "name": "Pointer Declaration",
+      "description": "Declare an int pointer that points to a variable 'x'.",
+      "correctExample": "int* ptr = &x;",
+      "answerPattern": "int\\s*\\*\\s*\\w+\\s*=\\s*&\\s*\\w+",
+      "feedback": "Syntax: int* ptr = &variable;"
+    }
+  ]
+}
