@@ -1,7 +1,7 @@
 using Lexicanum.UI;
 using Spectre.Console;
 
-namespace Lexicanum.Startup;
+namespace Lexicanum.Features.Welcome;
 
 public class WelcomeScreen
 {

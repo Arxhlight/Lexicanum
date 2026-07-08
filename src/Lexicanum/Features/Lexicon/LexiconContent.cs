@@ -1,44 +1,36 @@
-using Lexicanum.Core.Interfaces;
-using Lexicanum.Core.Models;
-using Lexicanum.UI;
+using Lexicanum.Navigation;
 
 namespace Lexicanum.Features.Lexicon;
 
-public static class LexiconViewer
+/// <summary>
+/// The lexicon's reference material and the menu tree that exposes it.
+/// </summary>
+public static class LexiconContent
 {
-    public static Category CreateLexiconCategory()
+    public static MenuNode CreateMenuNode()
     {
-        var category = new Category("Lexicon", "Reference guides and command documentation");
+        return MenuNode.Branch("Lexicon", "Reference guides and command documentation",
+            CreateTerminalCommandsNode(),
+            CreateGitCommandsNode(),
+            CreateGitLfsNode(),
+            CreateFlagReferenceNode(),
+            CreateWorkflowsNode(),
+            CreateSafetyWarningsNode());
+    }
 
-        category.AddSubCategory(CreateTerminalCommandsSubCategory());
-        category.AddSubCategory(CreateGitCommandsSubCategory());
-        category.AddSubCategory(CreateGitLfsSubCategory());
-        category.AddSubCategory(CreateFlagReferenceSubCategory());
-        category.AddSubCategory(CreateWorkflowsSubCategory());
-        category.AddSubCategory(CreateSafetyWarningsSubCategory());
-
-        return category;
+    private static MenuNode EntryLeaf(string title, string description, string entryTitle, Func<string> contentFactory)
+    {
+        return MenuNode.Leaf(title, description, () => new LexiconEntryScreen(entryTitle, contentFactory()));
     }
 
     #region Terminal Commands
 
-    private static SubCategory CreateTerminalCommandsSubCategory()
+    private static MenuNode CreateTerminalCommandsNode()
     {
-        var terminalCommands = new SubCategory("Terminal Commands", "Command line essentials");
-
-        var filesystemNav = new SubCategory("Filesystem Navigation", "Navigate and manage files");
-        filesystemNav.AddContentItem(new LexiconEntry("Filesystem Navigation", GetFilesystemNavigationContent()));
-        terminalCommands.AddSubCategory(filesystemNav);
-
-        var fileOps = new SubCategory("File Operations", "Create, copy, move, and delete files");
-        fileOps.AddContentItem(new LexiconEntry("File Operations", GetFileOperationsContent()));
-        terminalCommands.AddSubCategory(fileOps);
-
-        var processMgmt = new SubCategory("Process Management", "Manage running processes");
-        processMgmt.AddContentItem(new LexiconEntry("Process Management", GetProcessManagementContent()));
-        terminalCommands.AddSubCategory(processMgmt);
-
-        return terminalCommands;
+        return MenuNode.Branch("Terminal Commands", "Command line essentials",
+            EntryLeaf("Filesystem Navigation", "Navigate and manage files", "Filesystem Navigation", GetFilesystemNavigationContent),
+            EntryLeaf("File Operations", "Create, copy, move, and delete files", "File Operations", GetFileOperationsContent),
+            EntryLeaf("Process Management", "Manage running processes", "Process Management", GetProcessManagementContent));
     }
 
     private static string GetFilesystemNavigationContent()
@@ -151,44 +143,19 @@ Ctrl+Z                       # Pause current foreground process
 
     #region Git Commands
 
-    private static SubCategory CreateGitCommandsSubCategory()
+    private static MenuNode CreateGitCommandsNode()
     {
-        var gitCommands = new SubCategory("Git Commands", "Version control commands and workflows");
-
-        var repoInspection = new SubCategory("Repository Inspection", "Inspect repository state");
-        repoInspection.AddContentItem(new LexiconEntry("Repository Inspection", GetGitInspectionContent()));
-        gitCommands.AddSubCategory(repoInspection);
-
-        var stagingCommitting = new SubCategory("Staging & Committing", "Stage and commit changes");
-        stagingCommitting.AddContentItem(new LexiconEntry("Staging & Committing", GetGitStagingContent()));
-        gitCommands.AddSubCategory(stagingCommitting);
-
-        var workingDir = new SubCategory("Working Directory Changes", "Manage uncommitted changes");
-        workingDir.AddContentItem(new LexiconEntry("Working Directory Changes", GetWorkingDirectoryContent()));
-        gitCommands.AddSubCategory(workingDir);
-
-        var branchMgmt = new SubCategory("Branch Management", "Create, switch, and delete branches");
-        branchMgmt.AddContentItem(new LexiconEntry("Branch Management", GetBranchManagementContent()));
-        gitCommands.AddSubCategory(branchMgmt);
-
-        var merging = new SubCategory("Merging", "Merge branches together");
-        merging.AddContentItem(new LexiconEntry("Merging", GetMergingContent()));
-        gitCommands.AddSubCategory(merging);
-
-        var rebasing = new SubCategory("Rebasing", "Rebase commits onto another branch");
-        rebasing.AddContentItem(new LexiconEntry("Rebasing", GetRebasingContent()));
-        gitCommands.AddSubCategory(rebasing);
-
-        var remoteOps = new SubCategory("Remote Operations", "Push, pull, and fetch");
-        remoteOps.AddContentItem(new LexiconEntry("Remote Operations", GetRemoteOperationsContent()));
-        gitCommands.AddSubCategory(remoteOps);
-
-        var submodules = new SubCategory("Submodules", "Manage Git submodules");
-        submodules.AddContentItem(new LexiconEntry("Submodule Commands", GetSubmoduleCommandsContent()));
-        submodules.AddContentItem(new LexiconEntry("Submodule Status Symbols", GetSubmoduleStatusContent()));
-        gitCommands.AddSubCategory(submodules);
-
-        return gitCommands;
+        return MenuNode.Branch("Git Commands", "Version control commands and workflows",
+            EntryLeaf("Repository Inspection", "Inspect repository state", "Repository Inspection", GetGitInspectionContent),
+            EntryLeaf("Staging & Committing", "Stage and commit changes", "Staging & Committing", GetGitStagingContent),
+            EntryLeaf("Working Directory Changes", "Manage uncommitted changes", "Working Directory Changes", GetWorkingDirectoryContent),
+            EntryLeaf("Branch Management", "Create, switch, and delete branches", "Branch Management", GetBranchManagementContent),
+            EntryLeaf("Merging", "Merge branches together", "Merging", GetMergingContent),
+            EntryLeaf("Rebasing", "Rebase commits onto another branch", "Rebasing", GetRebasingContent),
+            EntryLeaf("Remote Operations", "Push, pull, and fetch", "Remote Operations", GetRemoteOperationsContent),
+            MenuNode.Branch("Submodules", "Manage Git submodules",
+                EntryLeaf("Submodule Commands", "Everyday submodule operations", "Submodule Commands", GetSubmoduleCommandsContent),
+                EntryLeaf("Submodule Status Symbols", "Reading submodule status output", "Submodule Status Symbols", GetSubmoduleStatusContent)));
     }
 
     private static string GetGitInspectionContent()
@@ -481,19 +448,11 @@ $ git submodule status
 
     #region Git LFS
 
-    private static SubCategory CreateGitLfsSubCategory()
+    private static MenuNode CreateGitLfsNode()
     {
-        var gitLfs = new SubCategory("Git LFS Commands", "Large File Storage commands");
-
-        var lfsInspection = new SubCategory("LFS Inspection", "Inspect LFS tracked files");
-        lfsInspection.AddContentItem(new LexiconEntry("LFS Inspection", GetLfsInspectionContent()));
-        gitLfs.AddSubCategory(lfsInspection);
-
-        var lfsSubmodules = new SubCategory("LFS in Submodules", "LFS commands for submodules");
-        lfsSubmodules.AddContentItem(new LexiconEntry("LFS in Submodules", GetLfsSubmodulesContent()));
-        gitLfs.AddSubCategory(lfsSubmodules);
-
-        return gitLfs;
+        return MenuNode.Branch("Git LFS Commands", "Large File Storage commands",
+            EntryLeaf("LFS Inspection", "Inspect LFS tracked files", "LFS Inspection", GetLfsInspectionContent),
+            EntryLeaf("LFS in Submodules", "LFS commands for submodules", "LFS in Submodules", GetLfsSubmodulesContent));
     }
 
     private static string GetLfsInspectionContent()
@@ -541,11 +500,9 @@ git -C <submodule> lfs uninstall --local # Disable LFS in submodule
 
     #region Flag Reference
 
-    private static SubCategory CreateFlagReferenceSubCategory()
+    private static MenuNode CreateFlagReferenceNode()
     {
-        var flagRef = new SubCategory("Flag Reference", "Common command flags explained");
-        flagRef.AddContentItem(new LexiconEntry("Common Flags", GetFlagReferenceContent()));
-        return flagRef;
+        return EntryLeaf("Flag Reference", "Common command flags explained", "Common Flags", GetFlagReferenceContent);
     }
 
     private static string GetFlagReferenceContent()
@@ -608,31 +565,14 @@ Common command line flags and their meanings.
 
     #region Common Workflows
 
-    private static SubCategory CreateWorkflowsSubCategory()
+    private static MenuNode CreateWorkflowsNode()
     {
-        var workflows = new SubCategory("Common Workflows", "Step-by-step workflow guides");
-
-        var featureBranch = new SubCategory("Feature Branch Workflow", "Create branch, commit, push");
-        featureBranch.AddContentItem(new LexiconEntry("Feature Branch Workflow", GetFeatureBranchWorkflowContent()));
-        workflows.AddSubCategory(featureBranch);
-
-        var quickCommit = new SubCategory("Quick Commit Workflow", "Stage all and push");
-        quickCommit.AddContentItem(new LexiconEntry("Quick Commit Workflow", GetQuickCommitWorkflowContent()));
-        workflows.AddSubCategory(quickCommit);
-
-        var submoduleWorkflow = new SubCategory("Submodule Workflow", "Add and manage submodules");
-        submoduleWorkflow.AddContentItem(new LexiconEntry("Add Submodule Workflow", GetSubmoduleWorkflowContent()));
-        workflows.AddSubCategory(submoduleWorkflow);
-
-        var rebaseWorkflow = new SubCategory("Rebase Workflow", "Rebase feature onto main");
-        rebaseWorkflow.AddContentItem(new LexiconEntry("Rebase Feature Workflow", GetRebaseWorkflowContent()));
-        workflows.AddSubCategory(rebaseWorkflow);
-
-        var unstageWorkflow = new SubCategory("Unstage Workflow", "Safely unstage files");
-        unstageWorkflow.AddContentItem(new LexiconEntry("Unstage Files Safely", GetUnstageWorkflowContent()));
-        workflows.AddSubCategory(unstageWorkflow);
-
-        return workflows;
+        return MenuNode.Branch("Common Workflows", "Step-by-step workflow guides",
+            EntryLeaf("Feature Branch Workflow", "Create branch, commit, push", "Feature Branch Workflow", GetFeatureBranchWorkflowContent),
+            EntryLeaf("Quick Commit Workflow", "Stage all and push", "Quick Commit Workflow", GetQuickCommitWorkflowContent),
+            EntryLeaf("Submodule Workflow", "Add and manage submodules", "Add Submodule Workflow", GetSubmoduleWorkflowContent),
+            EntryLeaf("Rebase Workflow", "Rebase feature onto main", "Rebase Feature Workflow", GetRebaseWorkflowContent),
+            EntryLeaf("Unstage Workflow", "Safely unstage files", "Unstage Files Safely", GetUnstageWorkflowContent));
     }
 
     private static string GetFeatureBranchWorkflowContent()
@@ -763,11 +703,9 @@ git commit -m ""Add new features""
 
     #region Safety Warnings
 
-    private static SubCategory CreateSafetyWarningsSubCategory()
+    private static MenuNode CreateSafetyWarningsNode()
     {
-        var safety = new SubCategory("Safety Warnings", "Dangerous commands to use with caution");
-        safety.AddContentItem(new LexiconEntry("Dangerous Commands", GetSafetyWarningsContent()));
-        return safety;
+        return EntryLeaf("Safety Warnings", "Dangerous commands to use with caution", "Dangerous Commands", GetSafetyWarningsContent);
     }
 
     private static string GetSafetyWarningsContent()

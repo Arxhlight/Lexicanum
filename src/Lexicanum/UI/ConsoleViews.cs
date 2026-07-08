@@ -54,14 +54,6 @@ public static class ConsoleViews
         console.Write(panel);
     }
 
-    public static void ShowContentPage(this IAnsiConsole console, string title, string content)
-    {
-        console.ShowScreenHeader(title);
-        console.Write(new Text(content, Theme.BodyStyle));
-        console.WriteLine();
-        console.WaitForKey();
-    }
-
     public static void WaitForKey(this IAnsiConsole console, string prompt = "Press any key to continue...")
     {
         console.MarkupLine($"[{Theme.Muted}]{Markup.Escape(prompt)}[/]");

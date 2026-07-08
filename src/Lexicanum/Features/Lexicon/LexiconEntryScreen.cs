@@ -1,26 +1,31 @@
-using Lexicanum.Core.Interfaces;
+using Lexicanum.Navigation;
 using Lexicanum.UI;
 using Spectre.Console;
 
 namespace Lexicanum.Features.Lexicon;
 
-public class LexiconEntry : IContentItem
+/// <summary>
+/// Renders one lexicon reference page, styling its markdown-like content
+/// (## headings, ``` code fences, bullet lines).
+/// </summary>
+public sealed class LexiconEntryScreen : IScreen
 {
     public string Title { get; }
     public string Content { get; }
 
-    public LexiconEntry(string title, string content)
+    public LexiconEntryScreen(string title, string content)
     {
         Title = title;
         Content = content;
     }
 
-    public void Display(IAnsiConsole console)
+    public ScreenResult Run(IAnsiConsole console)
     {
         console.ShowScreenHeader(Title);
         DisplayFormattedContent(console, Content);
         console.WriteLine();
         console.WaitForKey();
+        return ScreenResult.Pop;
     }
 
     private static void DisplayFormattedContent(IAnsiConsole console, string content)

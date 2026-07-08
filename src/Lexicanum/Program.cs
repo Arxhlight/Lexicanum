@@ -1,6 +1,10 @@
-using Lexicanum.Core.Data;
 using Lexicanum.Core.Services;
-using Lexicanum.Startup;
+using Lexicanum.Features.CodeTrainer;
+using Lexicanum.Features.Lexicon;
+using Lexicanum.Features.Quizlet;
+using Lexicanum.Features.Scoreboard;
+using Lexicanum.Features.Welcome;
+using Lexicanum.Navigation;
 using Lexicanum.UI;
 using Spectre.Console;
 
@@ -29,37 +33,35 @@ internal sealed class Program
     }
 }
 
+/// <summary>
+/// The composition root: wires the console, services, and menu tree together
+/// and owns the application lifecycle (welcome, main loop, save, farewell).
+/// </summary>
 public class LexicanumApp
 {
     private readonly IAnsiConsole _console;
-    private readonly CategoryRegistry _registry;
-    private readonly MenuSystem _menuSystem;
-    private readonly WelcomeScreen _welcomeScreen;
     private readonly ScoreService _scoreService;
 
     public LexicanumApp(IAnsiConsole console)
     {
         _console = console;
-        _registry = new CategoryRegistry();
         _scoreService = new ScoreService();
-        _menuSystem = new MenuSystem(_registry, console, new NavigationManager(console, _scoreService));
-        _welcomeScreen = new WelcomeScreen(console);
-
-        LoadCategories();
-    }
-
-    private void LoadCategories()
-    {
-        var loader = new ContentLoader(_registry);
-        loader.LoadCategories(ContentRepository.GetAllCategories(_console, _scoreService));
     }
 
     public void Run()
     {
-        _welcomeScreen.Show();
-        _scoreService.SetPlayerName(_welcomeScreen.GetPlayerName());
+        var welcome = new WelcomeScreen(_console);
+        welcome.Show();
+        _scoreService.SetPlayerName(welcome.GetPlayerName());
 
-        _menuSystem.ShowMainMenu();
+        var rootMenu = MenuNode.Branch("LEXICANUM - Main Menu", null,
+            LexiconContent.CreateMenuNode(),
+            QuizScreen.CreateMenuNode(_scoreService),
+            CodeTrainerScreen.CreateMenuNode(_scoreService),
+            ScoreboardScreen.CreateMenuNode(_scoreService));
+
+        var navigator = new ScreenNavigator(_console);
+        navigator.Run(new MenuScreen(rootMenu, _scoreService, isRoot: true));
 
         SaveScoreSafely();
         ShowFarewell();
