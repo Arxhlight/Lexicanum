@@ -63,8 +63,9 @@ dotnet_naming_rule.types_and_members_are_pascal_case.symbols = types_and_members
 dotnet_naming_rule.types_and_members_are_pascal_case.style = pascal_case
 dotnet_naming_symbols.types_and_members.applicable_kinds = class, struct, interface, enum, property, method, event, delegate
 
-# UI seam classes stay instance-based so they can be injected and substituted;
-# CA1822 (mark members static) conflicts with that by design. The whole folder is
-# replaced by Spectre.Console's IAnsiConsole in the UI-layer migration.
-[**/UI/*.cs]
-dotnet_diagnostic.CA1822.severity = none
+# Test names follow Microsoft's Method_Scenario_ExpectedBehavior convention,
+# which CA1707 (no underscores) would forbid; CA1861 (cached arrays) is noise
+# in single-run assertions.
+[tests/**.cs]
+dotnet_diagnostic.CA1707.severity = none
+dotnet_diagnostic.CA1861.severity = none
