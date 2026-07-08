@@ -1,4 +1,4 @@
-using Lexicanum.Core.Models;
+using Lexicanum.Core.Scoring;
 using Spectre.Console;
 
 namespace Lexicanum.UI;

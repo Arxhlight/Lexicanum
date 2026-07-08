@@ -1,4 +1,4 @@
-using Lexicanum.Core.Services;
+using Lexicanum.Core.Scoring;
 using Lexicanum.Navigation;
 using Lexicanum.UI;
 using Spectre.Console;
@@ -34,6 +34,11 @@ public sealed class ScoreboardScreen : IScreen
     public ScreenResult Run(IAnsiConsole console)
     {
         console.ShowScreenHeader(Title);
+
+        if (_view != ScoreboardView.CurrentSession && _scoreService.LoadScoreboard().LoadFailed)
+        {
+            console.ShowError("Existing highscores could not be read; showing a fresh scoreboard.");
+        }
 
         switch (_view)
         {

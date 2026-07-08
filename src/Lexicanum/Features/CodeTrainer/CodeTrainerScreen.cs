@@ -1,5 +1,5 @@
 using Lexicanum.Core.Content;
-using Lexicanum.Core.Services;
+using Lexicanum.Core.Scoring;
 using Lexicanum.Navigation;
 using Lexicanum.UI;
 using Spectre.Console;
@@ -12,9 +12,6 @@ namespace Lexicanum.Features.CodeTrainer;
 /// </summary>
 public sealed class CodeTrainerScreen : IScreen
 {
-    private const string FeatureName = "CodeTraining";
-    private const int PointsPerCorrectAnswer = 100;
-
     private readonly ContentPack<CodeExercise> _pack;
     private readonly ScoreService _scoreService;
 
@@ -70,7 +67,7 @@ public sealed class CodeTrainerScreen : IScreen
 
         if (CodeAnswerValidator.IsCorrect(exercise, userCode))
         {
-            _scoreService.AddScore(FeatureName, PointsPerCorrectAnswer);
+            _scoreService.AddScore(FeatureIds.CodeTrainer, ScoringRules.PointsPerCorrectAnswer);
             console.ShowSuccess("Correct! ...I suppose even you can get lucky sometimes.");
 
             if (!string.IsNullOrEmpty(exercise.SuccessFeedback))
@@ -79,7 +76,7 @@ public sealed class CodeTrainerScreen : IScreen
             }
 
             console.WaitForKey();
-            return PointsPerCorrectAnswer;
+            return ScoringRules.PointsPerCorrectAnswer;
         }
 
         if (hardmode)
@@ -139,11 +136,11 @@ public sealed class CodeTrainerScreen : IScreen
         {
             console.ShowNarrator("Failed in hardmode. The shame will follow you forever.");
         }
-        else if (sessionScore > 300)
+        else if (sessionScore > ScoringRules.CodeExcellentScore)
         {
             console.ShowNarrator("Impressive score. Don't let it go to your head.");
         }
-        else if (sessionScore > 100)
+        else if (sessionScore > ScoringRules.CodeGoodScore)
         {
             console.ShowNarrator("Acceptable. Room for improvement... lots of room.");
         }

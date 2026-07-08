@@ -1,4 +1,4 @@
-namespace Lexicanum.Core.Models;
+namespace Lexicanum.Core.Scoring;
 
 /// <summary>
 /// A player's score for one session. Serves as both the live session state and the persisted scoreboard record.
@@ -11,19 +11,12 @@ public class PlayerScore
 
     public int TotalScore => FeatureScores.Values.Sum();
 
-    public PlayerScore() { }
-
-    public PlayerScore(string playerName)
+    public void AddScore(string featureId, int points)
     {
-        PlayerName = playerName;
-    }
-
-    public void AddScore(string featureName, int points)
-    {
-        if (!FeatureScores.ContainsKey(featureName))
+        if (!FeatureScores.ContainsKey(featureId))
         {
-            FeatureScores[featureName] = 0;
+            FeatureScores[featureId] = 0;
         }
-        FeatureScores[featureName] += points;
+        FeatureScores[featureId] += points;
     }
 }

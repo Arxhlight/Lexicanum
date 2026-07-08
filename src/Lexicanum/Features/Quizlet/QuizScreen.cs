@@ -1,5 +1,5 @@
 using Lexicanum.Core.Content;
-using Lexicanum.Core.Services;
+using Lexicanum.Core.Scoring;
 using Lexicanum.Navigation;
 using Lexicanum.UI;
 using Spectre.Console;
@@ -12,9 +12,6 @@ namespace Lexicanum.Features.Quizlet;
 /// </summary>
 public sealed class QuizScreen : IScreen
 {
-    private const string FeatureName = "Quizlet";
-    private const int PointsPerCorrectAnswer = 100;
-
     private readonly IReadOnlyList<QuizQuestion> _questions;
     private readonly ScoreService _scoreService;
 
@@ -50,7 +47,7 @@ public sealed class QuizScreen : IScreen
             if (shuffled.CheckAnswer(answer))
             {
                 correctAnswers++;
-                _scoreService.AddScore(FeatureName, PointsPerCorrectAnswer);
+                _scoreService.AddScore(FeatureIds.Quizlet, ScoringRules.PointsPerCorrectAnswer);
                 console.ShowSuccess("Correct!");
             }
             else
@@ -87,18 +84,18 @@ public sealed class QuizScreen : IScreen
         var percentage = totalQuestions > 0 ? (correctAnswers * 100) / totalQuestions : 0;
 
         console.ShowInfo($"Your Score: {correctAnswers} / {totalQuestions} ({percentage}%)");
-        console.ShowInfo($"Points Earned: {correctAnswers * PointsPerCorrectAnswer}");
+        console.ShowInfo($"Points Earned: {correctAnswers * ScoringRules.PointsPerCorrectAnswer}");
         console.WriteLine();
 
-        if (percentage >= 90)
+        if (percentage >= ScoringRules.QuizExcellentPercent)
         {
             console.ShowNarrator("Impressive... I suppose even a broken clock is right twice a day.");
         }
-        else if (percentage >= 70)
+        else if (percentage >= ScoringRules.QuizGoodPercent)
         {
             console.ShowNarrator("Not terrible. You might actually learn something yet.");
         }
-        else if (percentage >= 50)
+        else if (percentage >= ScoringRules.QuizPassablePercent)
         {
             console.ShowNarrator("Mediocre at best. I expected nothing and I'm still disappointed.");
         }

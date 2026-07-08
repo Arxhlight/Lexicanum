@@ -1,5 +1,5 @@
 using Lexicanum.Core.Content;
-using Lexicanum.Core.Services;
+using Lexicanum.Core.Scoring;
 using Lexicanum.Features.CodeTrainer;
 using Lexicanum.Features.Lexicon;
 using Lexicanum.Features.Quizlet;
@@ -76,10 +76,23 @@ public class LexicanumApp
     private readonly ScoreService _scoreService;
 
     public LexicanumApp(IAnsiConsole console, ApplicationContent content)
+        : this(console, content, new ScoreService(new JsonScoreStore(DefaultScoreFilePath())))
+    {
+    }
+
+    public LexicanumApp(IAnsiConsole console, ApplicationContent content, ScoreService scoreService)
     {
         _console = console;
         _content = content;
-        _scoreService = new ScoreService();
+        _scoreService = scoreService;
+    }
+
+    private static string DefaultScoreFilePath()
+    {
+        return Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "Lexicanum",
+            "highscores.json");
     }
 
     public void Run()
