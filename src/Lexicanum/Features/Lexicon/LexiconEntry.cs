@@ -1,5 +1,6 @@
 using Lexicanum.Core.Interfaces;
 using Lexicanum.UI;
+using Spectre.Console;
 
 namespace Lexicanum.Features.Lexicon;
 
@@ -14,20 +15,15 @@ public class LexiconEntry : IContentItem
         Content = content;
     }
 
-    public void Display()
+    public void Display(IAnsiConsole console)
     {
-        var console = new ConsoleHelper();
-        Console.Clear();
-        console.ShowHeader(Title);
-        Console.WriteLine();
-
-        DisplayFormattedContent(Content);
-
-        Console.WriteLine();
-        console.WaitForInput();
+        console.ShowScreenHeader(Title);
+        DisplayFormattedContent(console, Content);
+        console.WriteLine();
+        console.WaitForKey();
     }
 
-    private static void DisplayFormattedContent(string content)
+    private static void DisplayFormattedContent(IAnsiConsole console, string content)
     {
         var lines = content.Split('\n');
         bool inCodeBlock = false;
@@ -37,36 +33,29 @@ public class LexiconEntry : IContentItem
             if (line.TrimStart().StartsWith("```", StringComparison.Ordinal))
             {
                 inCodeBlock = !inCodeBlock;
-                Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.WriteLine(inCodeBlock ? "┌─ Code ─────────────────────" : "└────────────────────────────");
-                Console.ResetColor();
+                console.Write(new Text(inCodeBlock ? "┌─ Code ─────────────────────" : "└────────────────────────────", Theme.MutedStyle));
+                console.WriteLine();
                 continue;
             }
 
             if (inCodeBlock)
             {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine($"  {line}");
-                Console.ResetColor();
+                console.Write(new Text($"  {line}", Theme.CodeBlockStyle));
             }
             else if (line.TrimStart().StartsWith("##", StringComparison.Ordinal))
             {
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine(line.Replace("##", "►"));
-                Console.ResetColor();
+                console.Write(new Text(line.Replace("##", "►"), Theme.AccentStyle));
             }
             else if (line.TrimStart().StartsWith('-') || line.TrimStart().StartsWith('•'))
             {
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine($"  {line}");
-                Console.ResetColor();
+                console.Write(new Text($"  {line}", Theme.BodyStyle));
             }
             else
             {
-                Console.ForegroundColor = ConsoleColor.Gray;
-                Console.WriteLine(line);
-                Console.ResetColor();
+                console.Write(new Text(line, Theme.MutedStyle));
             }
+
+            console.WriteLine();
         }
     }
 }

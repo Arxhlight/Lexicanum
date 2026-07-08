@@ -1,11 +1,26 @@
 using Lexicanum.UI;
+using Spectre.Console;
 
 namespace Lexicanum.Startup;
 
 public class WelcomeScreen
 {
-    private readonly ConsoleHelper _consoleHelper;
-    private readonly string[] _moxyMessages = new[]
+    private const string AsciiArt = @"
+    ╔═══════════════════════════════════════════════════════════════════════════════════╗
+    ║                                                                                   ║
+    ║     ██╗     ███████╗██╗  ██╗██╗ ██████╗ █████╗ ███╗   ██╗██╗   ██╗███╗   ███╗     ║
+    ║     ██║     ██╔════╝╚██╗██╔╝██║██╔════╝██╔══██╗████╗  ██║██║   ██║████╗ ████║     ║
+    ║     ██║     █████╗   ╚███╔╝ ██║██║     ███████║██╔██╗ ██║██║   ██║██╔████╔██║     ║
+    ║     ██║     ██╔══╝   ██╔██╗ ██║██║     ██╔══██║██║╚██╗██║██║   ██║██║╚██╔╝██║     ║
+    ║     ███████╗███████╗██╔╝ ██╗██║╚██████╗██║  ██║██║ ╚████║╚██████╔╝██║ ╚═╝ ██║     ║
+    ║     ╚══════╝╚══════╝╚═╝  ╚═╝╚═╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝     ╚═╝     ║
+    ║                                                                                   ║
+    ║  ~ Do you have what it takes to get your name scribed onto the black grimoire ~   ║
+    ║                                                                                   ║
+    ╚═══════════════════════════════════════════════════════════════════════════════════╝
+";
+
+    private static readonly string[] MoxyMessages =
     {
         "Ah, another brave soul enters the Lexicanum...",
         "Oh great, YOU again. Ready to embarrass yourself?",
@@ -17,69 +32,40 @@ public class WelcomeScreen
         "Behold! A wild programmer appears. Let's see what you've got."
     };
 
-    public WelcomeScreen(ConsoleHelper consoleHelper)
+    private readonly IAnsiConsole _console;
+
+    public WelcomeScreen(IAnsiConsole console)
     {
-        _consoleHelper = consoleHelper;
+        _console = console;
     }
 
     public void Show()
     {
-        _consoleHelper.ClearScreen();
-        ShowAsciiArt();
-        ShowMoxyWelcome();
-    }
-
-    private static void ShowAsciiArt()
-    {
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine(@"
-    ╔═══════════════════════════════════════════════════════════════════════════════════╗
-    ║                                                                                   ║
-    ║     ██╗     ███████╗██╗  ██╗██╗ ██████╗ █████╗ ███╗   ██╗██╗   ██╗███╗   ███╗     ║  
-    ║     ██║     ██╔════╝╚██╗██╔╝██║██╔════╝██╔══██╗████╗  ██║██║   ██║████╗ ████║     ║ 
-    ║     ██║     █████╗   ╚███╔╝ ██║██║     ███████║██╔██╗ ██║██║   ██║██╔████╔██║     ║ 
-    ║     ██║     ██╔══╝   ██╔██╗ ██║██║     ██╔══██║██║╚██╗██║██║   ██║██║╚██╔╝██║     ║ 
-    ║     ███████╗███████╗██╔╝ ██╗██║╚██████╗██║  ██║██║ ╚████║╚██████╔╝██║ ╚═╝ ██║     ║ 
-    ║     ╚══════╝╚══════╝╚═╝  ╚═╝╚═╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝     ╚═╝     ║ 
-    ║                                                                                   ║
-    ║  ~ Do you have what it takes to get your name scribed onto the black grimoire ~   ║ 
-    ║                                                                                   ║ 
-    ╚═══════════════════════════════════════════════════════════════════════════════════╝
-");
-        Console.ResetColor();
-    }
-
-    private void ShowMoxyWelcome()
-    {
-
-        var random = new Random();
-        var message = _moxyMessages[random.Next(_moxyMessages.Length)];
-
-        Console.WriteLine();
-        _consoleHelper.ShowNarrator(message);
-        Console.WriteLine();
+        _console.Clear();
+        _console.Write(new Text(AsciiArt, Theme.NarratorStyle));
+        _console.WriteLine();
+        _console.ShowNarrator(MoxyMessages[Random.Shared.Next(MoxyMessages.Length)]);
+        _console.WriteLine();
     }
 
     public string GetPlayerName()
     {
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.Write(">> State your name, seeker of knowledge: ");
-        Console.ResetColor();
-
-        var name = Console.ReadLine();
+        var name = _console.Prompt(
+            new TextPrompt<string>($"[{Theme.Narrator}]>> State your name, seeker of knowledge:[/]")
+                .AllowEmpty());
 
         if (string.IsNullOrWhiteSpace(name))
         {
             name = "Anonymous Coder";
-            _consoleHelper.ShowNarrator("Too shy to give your name? Fine, I'll call you 'Anonymous Coder'.");
+            _console.ShowNarrator("Too shy to give your name? Fine, I'll call you 'Anonymous Coder'.");
         }
         else
         {
-            _consoleHelper.ShowNarrator($"Welcome, {name}. Try not to disappoint me too much.");
+            _console.ShowNarrator($"Welcome, {name}. Try not to disappoint me too much.");
         }
 
-        Console.WriteLine();
-        _consoleHelper.WaitForInput();
+        _console.WriteLine();
+        _console.WaitForKey();
 
         return name;
     }

@@ -1,5 +1,6 @@
 using Lexicanum.Core.Interfaces;
 using Lexicanum.UI;
+using Spectre.Console;
 
 namespace Lexicanum.Core.Models;
 
@@ -14,9 +15,8 @@ public class ContentItem : IContentItem
         Content = content;
     }
 
-    public void Display()
+    public void Display(IAnsiConsole console)
     {
-        var helper = new ConsoleHelper();
-        helper.ShowContentPage(Title, Content);
+        console.ShowContentPage(Title, Content);
     }
 }

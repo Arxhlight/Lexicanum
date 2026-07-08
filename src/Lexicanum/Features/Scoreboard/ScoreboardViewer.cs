@@ -1,52 +1,47 @@
 using Lexicanum.Core.Models;
 using Lexicanum.Core.Services;
 using Lexicanum.UI;
+using Spectre.Console;
 
 namespace Lexicanum.Features.Scoreboard;
 
 public class ScoreboardViewer
 {
     private readonly ScoreService _scoreService;
-    private readonly ScoreRenderer _renderer;
-    private readonly ConsoleHelper _console;
-    private readonly InputHandler _input;
+    private readonly IAnsiConsole _console;
 
-    public ScoreboardViewer(ScoreService scoreService, ScoreRenderer renderer, ConsoleHelper console, InputHandler input)
+    public ScoreboardViewer(ScoreService scoreService, IAnsiConsole console)
     {
         _scoreService = scoreService;
-        _renderer = renderer;
         _console = console;
-        _input = input;
     }
 
     public void ShowScoreboard()
     {
-        _console.ClearScreen();
-        var topScores = _scoreService.GetTopScores(10);
-        _renderer.RenderScoreboard(topScores, "Top 10 Leaderboard");
-        _console.WaitForInput();
+        _console.ShowScreenHeader("Top 10 Leaderboard");
+        _console.ShowScoreboard(_scoreService.GetTopScores(10));
+        _console.WaitForKey();
     }
 
     public void ShowCurrentSession()
     {
-        _console.ClearScreen();
-        _renderer.RenderSessionSummary(_scoreService.CurrentScore);
-        _console.WaitForInput();
+        _console.ShowScreenHeader("Session Summary");
+        _console.ShowSessionSummary(_scoreService.CurrentScore);
+        _console.WaitForKey();
     }
 
     public void ShowPlayerHistory()
     {
-        _console.ClearScreen();
         var playerName = _scoreService.CurrentScore.PlayerName;
-        var history = _scoreService.GetPlayerHistory(playerName);
 
-        _renderer.RenderScoreboard(history, $"Score History - {playerName}");
-        _console.WaitForInput();
+        _console.ShowScreenHeader($"Score History - {playerName}");
+        _console.ShowScoreboard(_scoreService.GetPlayerHistory(playerName));
+        _console.WaitForKey();
     }
 
-    public static Category CreateScoreboardCategory(ScoreService scoreService, ScoreRenderer renderer, ConsoleHelper console, InputHandler input)
+    public static Category CreateScoreboardCategory(ScoreService scoreService, IAnsiConsole console)
     {
-        var viewer = new ScoreboardViewer(scoreService, renderer, console, input);
+        var viewer = new ScoreboardViewer(scoreService, console);
         var category = new Category("Scoreboard", "View scores and leaderboard");
 
         category.AddSubCategory(new SubCategory("Leaderboard", "View top 10 scores", _ =>

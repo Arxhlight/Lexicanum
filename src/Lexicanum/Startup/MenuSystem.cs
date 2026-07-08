@@ -1,25 +1,19 @@
-using Lexicanum.Core.Interfaces;
-using Lexicanum.Core.Models;
 using Lexicanum.Core.Services;
 using Lexicanum.UI;
+using Spectre.Console;
 
 namespace Lexicanum.Startup;
 
 public class MenuSystem
 {
     private readonly CategoryRegistry _registry;
-    private readonly ConsoleHelper _console;
-    private readonly MenuRenderer _renderer;
-    private readonly InputHandler _input;
+    private readonly IAnsiConsole _console;
     private readonly NavigationManager _navigation;
 
-    public MenuSystem(CategoryRegistry registry, ConsoleHelper console, MenuRenderer renderer,
-        InputHandler input, NavigationManager navigation)
+    public MenuSystem(CategoryRegistry registry, IAnsiConsole console, NavigationManager navigation)
     {
         _registry = registry;
         _console = console;
-        _renderer = renderer;
-        _input = input;
         _navigation = navigation;
     }
 
@@ -27,24 +21,21 @@ public class MenuSystem
     {
         while (true)
         {
-            _console.ClearScreen();
+            _console.ShowScreenHeader("LEXICANUM - Main Menu");
 
             var categories = _registry.GetAllCategories().ToList();
             var options = categories.Select(c => c.Name).ToList();
 
-            _renderer.RenderSimple("LEXICANUM - Main Menu", options, 0, "Exit");
+            var choice = _console.PromptMenu("Select a module:", options, "Exit");
 
-            var choice = _input.GetMenuChoice(categories.Count);
-
-            if (choice == 0)
+            if (choice == -1)
             {
                 _console.ShowNarrator("Leaving so soon? I expected as much from you.");
-                _console.WaitForInput();
-                break;
+                _console.WaitForKey();
+                return;
             }
 
-            var selectedCategory = categories[choice - 1];
-            _navigation.NavigateToCategory(selectedCategory);
+            _navigation.NavigateToCategory(categories[choice]);
         }
     }
 }

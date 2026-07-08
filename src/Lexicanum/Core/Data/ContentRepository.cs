@@ -4,7 +4,7 @@ using Lexicanum.Features.CodeTrainer;
 using Lexicanum.Features.Lexicon;
 using Lexicanum.Features.Quizlet;
 using Lexicanum.Features.Scoreboard;
-using Lexicanum.UI;
+using Spectre.Console;
 
 namespace Lexicanum.Core.Data;
 
@@ -14,12 +14,11 @@ namespace Lexicanum.Core.Data;
 /// </summary>
 public static class ContentRepository
 {
-    public static IEnumerable<ICategory> GetAllCategories(ConsoleHelper console, InputHandler input,
-        ScoreService scoreService, ScoreRenderer scoreRenderer)
+    public static IEnumerable<ICategory> GetAllCategories(IAnsiConsole console, ScoreService scoreService)
     {
         yield return LexiconViewer.CreateLexiconCategory();
-        yield return QuizSession.CreateQuizletCategory(console, input, scoreService);
-        yield return LiveCodeSession.CreateCodeTrainerCategory(console, input, scoreService);
-        yield return ScoreboardViewer.CreateScoreboardCategory(scoreService, scoreRenderer, console, input);
+        yield return QuizSession.CreateQuizletCategory(console, scoreService);
+        yield return LiveCodeSession.CreateCodeTrainerCategory(console, scoreService);
+        yield return ScoreboardViewer.CreateScoreboardCategory(scoreService, console);
     }
 }

@@ -1,6 +1,7 @@
 using Lexicanum.Core.Models;
 using Lexicanum.Core.Services;
 using Lexicanum.UI;
+using Spectre.Console;
 
 namespace Lexicanum.Features.Quizlet;
 
@@ -59,47 +60,43 @@ public class QuizSession
     private const string FeatureName = "Quizlet";
     private const int PointsPerCorrectAnswer = 100;
 
-    private readonly ConsoleHelper _console;
-    private readonly InputHandler _input;
+    private readonly IAnsiConsole _console;
     private readonly ScoreService _scoreService;
     private readonly List<QuizQuestion> _questions;
     private readonly Random _random;
     private int _sessionScore;
-    private int _currentQuestionIndex;
-    private int _totalQuestions;
 
     public string Name { get; }
 
-    public QuizSession(string name, List<QuizQuestion> questions, ConsoleHelper console, InputHandler input, ScoreService scoreService)
+    public QuizSession(string name, List<QuizQuestion> questions, IAnsiConsole console, ScoreService scoreService)
     {
         Name = name;
         _questions = questions;
         _console = console;
-        _input = input;
         _scoreService = scoreService;
         _random = new Random();
-        _sessionScore = 0;
-        _currentQuestionIndex = 0;
     }
 
     public void Start()
     {
         _sessionScore = 0;
-        _currentQuestionIndex = 0;
 
         var shuffledQuestions = ShuffleQuestions();
-        _totalQuestions = shuffledQuestions.Count;
+        var totalQuestions = shuffledQuestions.Count;
 
         _console.ShowNarrator($"Starting Quiz: {Name}");
-        _console.ShowInfo($"Total Questions: {_totalQuestions}");
-        _console.WaitForInput("Press Enter to begin...");
+        _console.ShowInfo($"Total Questions: {totalQuestions}");
+        _console.WaitForKey("Press any key to begin...");
 
-        foreach (var shuffled in shuffledQuestions)
+        for (int questionIndex = 0; questionIndex < totalQuestions; questionIndex++)
         {
-            _console.ClearScreen();
-            DisplayQuestion(shuffled);
+            var shuffled = shuffledQuestions[questionIndex];
 
-            var answer = _input.GetMenuChoice(shuffled.ShuffledOptions.Length, 1) - 1;
+            _console.ShowScreenHeader($"Question {questionIndex + 1} of {totalQuestions}", _scoreService.GetTotalScore());
+            _console.MarkupLine($"[{Theme.Body}]{Markup.Escape(shuffled.Original.Question)}[/]");
+            _console.WriteLine();
+
+            var answer = _console.PromptMenu("Select your answer:", shuffled.ShuffledOptions);
 
             if (shuffled.CheckAnswer(answer))
             {
@@ -112,14 +109,12 @@ public class QuizSession
                 _console.ShowError($"Wrong! The correct answer was: {shuffled.GetCorrectAnswer()}");
             }
 
-            Console.WriteLine();
+            _console.WriteLine();
             _console.ShowInfo($"Explanation: {shuffled.Original.Explanation}");
-            _console.WaitForInput();
-
-            _currentQuestionIndex++;
+            _console.WaitForKey();
         }
 
-        ShowResults();
+        ShowResults(totalQuestions);
     }
 
     private List<ShuffledQuestion> ShuffleQuestions()
@@ -135,36 +130,15 @@ public class QuizSession
         return questionsCopy.Select(q => new ShuffledQuestion(q, _random)).ToList();
     }
 
-    private void DisplayQuestion(ShuffledQuestion shuffled)
+    private void ShowResults(int totalQuestions)
     {
-        _console.ShowHeader($"Question {_currentQuestionIndex + 1} of {_totalQuestions}");
-        Console.WriteLine();
+        _console.ShowScreenHeader("Quiz Complete!");
 
-        Console.ForegroundColor = ConsoleColor.White;
-        Console.WriteLine(shuffled.Original.Question);
-        Console.ResetColor();
-        Console.WriteLine();
+        var percentage = totalQuestions > 0 ? (_sessionScore * 100) / totalQuestions : 0;
 
-        for (int i = 0; i < shuffled.ShuffledOptions.Length; i++)
-        {
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine($"  [{i + 1}] {shuffled.ShuffledOptions[i]}");
-        }
-        Console.ResetColor();
-        Console.WriteLine();
-    }
-
-    private void ShowResults()
-    {
-        _console.ClearScreen();
-        _console.ShowHeader("Quiz Complete!");
-
-        var percentage = _totalQuestions > 0 ? (_sessionScore * 100) / _totalQuestions : 0;
-
-        Console.WriteLine();
-        _console.ShowInfo($"Your Score: {_sessionScore} / {_totalQuestions} ({percentage}%)");
+        _console.ShowInfo($"Your Score: {_sessionScore} / {totalQuestions} ({percentage}%)");
         _console.ShowInfo($"Points Earned: {_sessionScore * PointsPerCorrectAnswer}");
-        Console.WriteLine();
+        _console.WriteLine();
 
         if (percentage >= 90)
         {
@@ -183,15 +157,15 @@ public class QuizSession
             _console.ShowNarrator("Pathetic. Did you even try? Perhaps coding isn't for you.");
         }
 
-        _console.WaitForInput();
+        _console.WaitForKey();
     }
 
-    public static Category CreateQuizletCategory(ConsoleHelper console, InputHandler input, ScoreService scoreService)
+    public static Category CreateQuizletCategory(IAnsiConsole console, ScoreService scoreService)
     {
         var category = new Category("Quizlet", "Test your knowledge with quizzes");
 
-        category.AddSubCategory(CreateGitQuizSubCategory(console, input, scoreService));
-        category.AddSubCategory(CreateProgrammingQuizSubCategory(console, input, scoreService));
+        category.AddSubCategory(CreateGitQuizSubCategory(console, scoreService));
+        category.AddSubCategory(CreateProgrammingQuizSubCategory(console, scoreService));
 
         return category;
     }
@@ -234,20 +208,20 @@ public class QuizSession
         )
     };
 
-    private static SubCategory CreateGitQuizSubCategory(ConsoleHelper console, InputHandler input, ScoreService scoreService)
+    private static SubCategory CreateGitQuizSubCategory(IAnsiConsole console, ScoreService scoreService)
     {
         return new SubCategory("Git Quiz", "Test your Git knowledge", _ =>
         {
-            var session = new QuizSession("Git Fundamentals", GitQuizQuestions, console, input, scoreService);
+            var session = new QuizSession("Git Fundamentals", GitQuizQuestions, console, scoreService);
             session.Start();
         });
     }
 
-    private static SubCategory CreateProgrammingQuizSubCategory(ConsoleHelper console, InputHandler input, ScoreService scoreService)
+    private static SubCategory CreateProgrammingQuizSubCategory(IAnsiConsole console, ScoreService scoreService)
     {
         return new SubCategory("Programming Basics Quiz", "Test your programming fundamentals", _ =>
         {
-            var session = new QuizSession("Programming Fundamentals", ProgrammingQuizQuestions, console, input, scoreService);
+            var session = new QuizSession("Programming Fundamentals", ProgrammingQuizQuestions, console, scoreService);
             session.Start();
         });
     }

@@ -1,47 +1,38 @@
 using Lexicanum.Core.Interfaces;
 using Lexicanum.Core.Services;
 using Lexicanum.UI;
+using Spectre.Console;
 
 namespace Lexicanum.Startup;
 
 public class NavigationManager
 {
-    private readonly ConsoleHelper _console;
-    private readonly MenuRenderer _renderer;
-    private readonly InputHandler _input;
+    private readonly IAnsiConsole _console;
     private readonly ScoreService _scoreService;
-    private readonly ScoreRenderer _scoreRenderer;
 
-    public NavigationManager(ConsoleHelper console, MenuRenderer renderer, InputHandler input,
-        ScoreService scoreService, ScoreRenderer scoreRenderer)
+    public NavigationManager(IAnsiConsole console, ScoreService scoreService)
     {
         _console = console;
-        _renderer = renderer;
-        _input = input;
         _scoreService = scoreService;
-        _scoreRenderer = scoreRenderer;
     }
 
     public void NavigateToCategory(ICategory category)
     {
         while (true)
         {
-            _console.ClearScreen();
-            _scoreRenderer.RenderScoreCorner(_scoreService.GetTotalScore());
+            _console.ShowScreenHeader(category.Name, _scoreService.GetTotalScore());
 
             var subCategories = category.SubCategories;
             var options = subCategories.Select(s => $"{s.Name} - {s.Description}").ToList();
 
-            _renderer.RenderSimple($"{category.Name}", options, 0, "Back");
+            var choice = _console.PromptMenu("Select:", options, "Back");
 
-            var choice = _input.GetMenuChoice(subCategories.Count);
-
-            if (choice == 0)
+            if (choice == -1)
             {
                 return;
             }
 
-            NavigateToSubCategory(subCategories[choice - 1]);
+            NavigateToSubCategory(subCategories[choice]);
         }
     }
 
@@ -49,8 +40,7 @@ public class NavigationManager
     {
         while (true)
         {
-            _console.ClearScreen();
-            _scoreRenderer.RenderScoreCorner(_scoreService.GetTotalScore());
+            _console.ShowScreenHeader(subCategory.Name, _scoreService.GetTotalScore());
 
             var subCategories = subCategory.SubCategories;
             var contentItems = subCategory.ContentItems;
@@ -61,35 +51,24 @@ public class NavigationManager
                 return;
             }
 
-            var options = new List<string>();
+            var options = subCategories.Select(sub => $"{sub.Name} - {sub.Description}")
+                .Concat(contentItems.Select(content => content.Title))
+                .ToList();
 
-            foreach (var sub in subCategories)
-            {
-                options.Add($"{sub.Name} - {sub.Description}");
-            }
+            var choice = _console.PromptMenu("Select:", options, "Back");
 
-            foreach (var content in contentItems)
-            {
-                options.Add($"{content.Title}");
-            }
-
-            _renderer.RenderSimple($"{subCategory.Name}", options, 0, "Back");
-
-            var choice = _input.GetMenuChoice(options.Count);
-
-            if (choice == 0)
+            if (choice == -1)
             {
                 return;
             }
 
-            if (choice <= subCategories.Count)
+            if (choice < subCategories.Count)
             {
-                NavigateToSubCategory(subCategories[choice - 1]);
+                NavigateToSubCategory(subCategories[choice]);
             }
             else
             {
-                var contentIndex = choice - subCategories.Count - 1;
-                contentItems[contentIndex].Display();
+                contentItems[choice - subCategories.Count].Display(_console);
             }
         }
     }
