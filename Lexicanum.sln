@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lexicanum", "Lexicanum\Lexicanum.csproj", "{BCD3A9EF-B447-4441-AD48-5FC11C19CC5B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lexicanum", "src\Lexicanum\Lexicanum.csproj", "{BCD3A9EF-B447-4441-AD48-5FC11C19CC5B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -90,7 +90,7 @@ jobs:
       
       - name: Publish application  # --no-build  “I guarantee build has already been run with compatible settings.”
         run: |
-          dotnet publish Lexicanum\Lexicanum.csproj `
+          dotnet publish src\Lexicanum\Lexicanum.csproj `
             --configuration ${{ env.Build_Configuration }} `
             --output ./publish
 
