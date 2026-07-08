@@ -1,11 +1,10 @@
-﻿namespace Lexicanum.Core.Interfaces
+namespace Lexicanum.Core.Interfaces;
+
+public interface ISubCategory
 {
-    public interface ISubCategory
-    {
-        string Name { get; }
-        string Description { get; }
-        List<IContentItem> ContentItems { get; }
-        List<ISubCategory> SubCategories { get; }
-        void Execute();
-    }
+    string Name { get; }
+    string Description { get; }
+    List<IContentItem> ContentItems { get; }
+    List<ISubCategory> SubCategories { get; }
+    void Execute();
 }

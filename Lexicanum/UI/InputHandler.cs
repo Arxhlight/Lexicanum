@@ -1,76 +1,76 @@
-﻿namespace Lexicanum.UI
+namespace Lexicanum.UI;
+
+public class InputHandler
 {
-    public class InputHandler
+    private readonly ConsoleHelper _console;
+
+    public InputHandler(ConsoleHelper console)
     {
-        private readonly ConsoleHelper _console;
+        _console = console;
+    }
 
-        public InputHandler(ConsoleHelper console)
+    public int GetMenuChoice(int maxOption, int minOption = 0)
+    {
+        WriteChoicePrompt();
+
+        while (true)
         {
-            _console = console;
-        }
+            var input = Console.ReadLine();
 
-        public int GetMenuChoice(int maxOption, int minOption = 0)
-        {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.Write(">> Your choice: ");
-            Console.ResetColor();
-
-            while (true)
+            if (int.TryParse(input, out int choice) && choice >= minOption && choice <= maxOption)
             {
-                var input = Console.ReadLine();
-                
-                if (int.TryParse(input, out int choice) && choice >= minOption && choice <= maxOption)
-                {
-                    return choice;
-                }
-
-                _console.ShowError($"Invalid choice. Please enter a number between {minOption} and {maxOption}.");
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write(">> Your choice: ");
-                Console.ResetColor();
-            }
-        }
-
-        public string GetTextInput(string prompt)
-        {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.Write($">> {prompt}: ");
-            Console.ResetColor();
-            
-            return Console.ReadLine() ?? string.Empty;
-        }
-
-        public bool GetYesNoInput(string prompt)
-        {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.Write($">> {prompt} (y/n): ");
-            Console.ResetColor();
-
-            while (true)
-            {
-                var input = Console.ReadLine()?.ToLower();
-                
-                if (input == "y" || input == "yes") return true;
-                if (input == "n" || input == "no") return false;
-
-                _console.ShowError("Please enter 'y' or 'n'.");
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write($">> {prompt} (y/n): ");
-                Console.ResetColor();
-            }
-        }
-
-        public string ReadMultilineInput()
-        {
-            var sb = new System.Text.StringBuilder();
-            string? line;
-
-            while (!string.IsNullOrWhiteSpace(line = Console.ReadLine()))
-            {
-                sb.AppendLine(line);
+                return choice;
             }
 
-            return sb.ToString();
+            _console.ShowError($"Invalid choice. Please enter a number between {minOption} and {maxOption}.");
+            WriteChoicePrompt();
         }
+    }
+
+    public bool GetYesNoInput(string prompt)
+    {
+        WritePrompt($"{prompt} (y/n)");
+
+        while (true)
+        {
+            var input = Console.ReadLine()?.ToLowerInvariant();
+
+            if (input is "y" or "yes")
+            {
+                return true;
+            }
+            if (input is "n" or "no")
+            {
+                return false;
+            }
+
+            _console.ShowError("Please enter 'y' or 'n'.");
+            WritePrompt($"{prompt} (y/n)");
+        }
+    }
+
+    public string ReadMultilineInput()
+    {
+        var sb = new System.Text.StringBuilder();
+        string? line;
+
+        while (!string.IsNullOrWhiteSpace(line = Console.ReadLine()))
+        {
+            sb.AppendLine(line);
+        }
+
+        return sb.ToString();
+    }
+
+    private static void WriteChoicePrompt()
+    {
+        WritePrompt("Your choice");
+    }
+
+    private static void WritePrompt(string prompt)
+    {
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.Write($">> {prompt}: ");
+        Console.ResetColor();
     }
 }

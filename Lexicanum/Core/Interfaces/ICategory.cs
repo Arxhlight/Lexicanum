@@ -1,10 +1,9 @@
-﻿namespace Lexicanum.Core.Interfaces
+namespace Lexicanum.Core.Interfaces;
+
+public interface ICategory
 {
-    public interface ICategory
-    {
-        string Name { get; }
-        string Description { get; }
-        List<ISubCategory> SubCategories { get; }
-        void Execute();
-    }
+    string Name { get; }
+    string Description { get; }
+    List<ISubCategory> SubCategories { get; }
+    void Execute();
 }

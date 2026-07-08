@@ -1,137 +1,98 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using Lexicanum.Core.Models;
 
-namespace Lexicanum.Core.Services
+namespace Lexicanum.Core.Services;
+
+/// <summary>
+/// Manages the current session score and persists finished sessions to a JSON scoreboard file.
+/// </summary>
+public class ScoreService
 {
-    /// <summary>
-    /// Manages the current session score and persistence to JSON.
-    /// </summary>
-    public class ScoreService
+    private static readonly JsonSerializerOptions SerializerOptions = new() { WriteIndented = true };
+
+    private readonly string _scoreFilePath;
+    private readonly PlayerScore _currentScore;
+
+    public PlayerScore CurrentScore => _currentScore;
+
+    public ScoreService(string scoreFilePath = "JSON/highscores.json")
     {
-        private readonly string _scoreFilePath;
-        private PlayerScore _currentScore;
+        _scoreFilePath = scoreFilePath;
+        _currentScore = new PlayerScore();
+    }
 
-        public PlayerScore CurrentScore => _currentScore;
+    public void SetPlayerName(string name)
+    {
+        _currentScore.PlayerName = name;
+    }
 
-        public ScoreService(string scoreFilePath = "JSON/highscores.json")
+    public void AddScore(string featureName, int points)
+    {
+        _currentScore.AddScore(featureName, points);
+    }
+
+    public int GetTotalScore()
+    {
+        return _currentScore.TotalScore;
+    }
+
+    /// <summary>
+    /// Appends the current session score to the scoreboard file.
+    /// </summary>
+    /// <exception cref="IOException">The scoreboard file could not be written.</exception>
+    /// <exception cref="UnauthorizedAccessException">The scoreboard file or directory is not writable.</exception>
+    public void SaveScore()
+    {
+        _currentScore.DateOfPlaying = DateTime.Now;
+
+        var scores = LoadScoreboard();
+        scores.Add(_currentScore);
+
+        var json = JsonSerializer.Serialize(scores, SerializerOptions);
+
+        var directory = Path.GetDirectoryName(_scoreFilePath);
+        if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
         {
-            _scoreFilePath = scoreFilePath;
-            _currentScore = new PlayerScore();
+            Directory.CreateDirectory(directory);
         }
 
-        /// <summary>
-        /// Set the player name for the current session.
-        /// </summary>
-        public void SetPlayerName(string name)
+        File.WriteAllText(_scoreFilePath, json);
+    }
+
+    /// <summary>
+    /// Loads all persisted scores. A missing, unreadable, or corrupt file yields an empty scoreboard.
+    /// </summary>
+    public List<PlayerScore> LoadScoreboard()
+    {
+        if (!File.Exists(_scoreFilePath))
         {
-            _currentScore.PlayerName = name;
+            return new List<PlayerScore>();
         }
 
-        /// <summary>
-        /// Add points to a feature for the current session.
-        /// </summary>
-        public void AddScore(string featureName, int points)
+        try
         {
-            _currentScore.AddScore(featureName, points);
+            var json = File.ReadAllText(_scoreFilePath);
+            return JsonSerializer.Deserialize<List<PlayerScore>>(json) ?? new List<PlayerScore>();
         }
-
-        /// <summary>
-        /// Remove points from a feature for the current session.
-        /// </summary>
-        public void RemoveScore(string featureName, int points)
+        catch (Exception ex) when (ex is JsonException or IOException or UnauthorizedAccessException)
         {
-            _currentScore.RemoveScore(featureName, points);
+            return new List<PlayerScore>();
         }
+    }
 
-        /// <summary>
-        /// Get the total score for the current session.
-        /// </summary>
-        public int GetTotalScore()
-        {
-            return _currentScore.TotalScore;
-        }
+    public List<PlayerScore> GetTopScores(int count = 10)
+    {
+        return LoadScoreboard()
+            .OrderByDescending(s => s.TotalScore)
+            .Take(count)
+            .ToList();
+    }
 
-        /// <summary>
-        /// Get score for a specific feature in the current session.
-        /// </summary>
-        public int GetFeatureScore(string featureName)
-        {
-            return _currentScore.GetFeatureScore(featureName);
-        }
-
-        /// <summary>
-        /// Reset the current session score.
-        /// </summary>
-        public void ResetSession()
-        {
-            var playerName = _currentScore.PlayerName;
-            _currentScore = new PlayerScore(playerName);
-        }
-
-        /// <summary>
-        /// Save the current session score to the JSON file.
-        /// </summary>
-        public void SaveScore()
-        {
-            _currentScore.DateOfPlaying = DateTime.Now;
-            
-            var scores = LoadScoreboard();
-            scores.Add(_currentScore);
-
-            var options = new JsonSerializerOptions { WriteIndented = true };
-            var json = JsonSerializer.Serialize(scores, options);
-            
-            // Ensure directory exists
-            var directory = Path.GetDirectoryName(_scoreFilePath);
-            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
-            {
-                Directory.CreateDirectory(directory);
-            }
-            
-            File.WriteAllText(_scoreFilePath, json);
-        }
-
-        /// <summary>
-        /// Load all scores from the JSON file.
-        /// </summary>
-        public List<PlayerScore> LoadScoreboard()
-        {
-            if (!File.Exists(_scoreFilePath))
-            {
-                return new List<PlayerScore>();
-            }
-
-            try
-            {
-                var json = File.ReadAllText(_scoreFilePath);
-                return JsonSerializer.Deserialize<List<PlayerScore>>(json) ?? new List<PlayerScore>();
-            }
-            catch
-            {
-                return new List<PlayerScore>();
-            }
-        }
-
-        /// <summary>
-        /// Get top scores sorted by total score descending.
-        /// </summary>
-        public List<PlayerScore> GetTopScores(int count = 10)
-        {
-            return LoadScoreboard()
-                .OrderByDescending(s => s.TotalScore)
-                .Take(count)
-                .ToList();
-        }
-
-        /// <summary>
-        /// Get score history for a specific player.
-        /// </summary>
-        public List<PlayerScore> GetPlayerHistory(string playerName)
-        {
-            return LoadScoreboard()
-                .Where(s => s.PlayerName.Equals(playerName, StringComparison.OrdinalIgnoreCase))
-                .OrderByDescending(s => s.DateOfPlaying)
-                .ToList();
-        }
+    public List<PlayerScore> GetPlayerHistory(string playerName)
+    {
+        return LoadScoreboard()
+            .Where(s => s.PlayerName.Equals(playerName, StringComparison.OrdinalIgnoreCase))
+            .OrderByDescending(s => s.DateOfPlaying)
+            .ToList();
     }
 }
