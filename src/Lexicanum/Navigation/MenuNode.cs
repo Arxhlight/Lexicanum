@@ -1,3 +1,5 @@
+using Lexicanum.Core.Content;
+
 namespace Lexicanum.Navigation;
 
 /// <summary>
@@ -18,5 +20,22 @@ public sealed record MenuNode(
     public static MenuNode Leaf(string title, string? description, Func<IScreen> screenFactory)
     {
         return new MenuNode(title, description, Array.Empty<MenuNode>(), screenFactory);
+    }
+
+    /// <summary>
+    /// The one convention for turning content packs into navigation:
+    /// each pack becomes a leaf whose screen the factory creates.
+    /// </summary>
+    public static MenuNode BranchFromPacks<T>(
+        string title,
+        string? description,
+        IReadOnlyList<ContentPack<T>> packs,
+        Func<ContentPack<T>, IScreen> screenFactory)
+    {
+        var leaves = packs
+            .Select(pack => Leaf(pack.Category, pack.Description, () => screenFactory(pack)))
+            .ToArray();
+
+        return Branch(title, description, leaves);
     }
 }

@@ -21,12 +21,13 @@ public sealed class EmbeddedContentSource : IContentSource
     };
 
     private readonly Assembly _assembly = typeof(EmbeddedContentSource).Assembly;
+    private readonly string[] _allResourceNames = typeof(EmbeddedContentSource).Assembly.GetManifestResourceNames();
 
     public IReadOnlyList<ContentPack<T>> LoadPacks<T>(string area)
     {
         var areaPrefix = $"{ResourcePrefix}{area}.";
 
-        var resourceNames = _assembly.GetManifestResourceNames()
+        var resourceNames = _allResourceNames
             .Where(name => name.StartsWith(areaPrefix, StringComparison.Ordinal)
                         && name.EndsWith(".json", StringComparison.Ordinal))
             .OrderBy(name => name, StringComparer.Ordinal)

@@ -66,13 +66,8 @@ public sealed class QuizScreen : IScreen
 
     private List<ShuffledQuestion> ShuffleQuestions()
     {
-        var questionsCopy = _questions.ToList();
-
-        for (int i = questionsCopy.Count - 1; i > 0; i--)
-        {
-            int j = Random.Shared.Next(i + 1);
-            (questionsCopy[i], questionsCopy[j]) = (questionsCopy[j], questionsCopy[i]);
-        }
+        var questionsCopy = _questions.ToArray();
+        Random.Shared.Shuffle(questionsCopy);
 
         return questionsCopy.Select(q => new ShuffledQuestion(q, Random.Shared)).ToList();
     }
@@ -109,11 +104,7 @@ public sealed class QuizScreen : IScreen
 
     public static MenuNode CreateMenuNode(IReadOnlyList<ContentPack<QuizQuestion>> quizPacks, ScoreService scoreService)
     {
-        var quizLeaves = quizPacks
-            .Select(pack => MenuNode.Leaf(pack.Category, pack.Description,
-                () => new QuizScreen(pack.Category, pack.Items, scoreService)))
-            .ToArray();
-
-        return MenuNode.Branch("Quizlet", "Test your knowledge with quizzes", quizLeaves);
+        return MenuNode.BranchFromPacks("Quizlet", "Test your knowledge with quizzes", quizPacks,
+            pack => new QuizScreen(pack.Category, pack.Items, scoreService));
     }
 }

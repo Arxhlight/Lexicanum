@@ -10,19 +10,19 @@ namespace Lexicanum.Features.Lexicon;
 /// </summary>
 public sealed class LexiconEntryScreen : IScreen
 {
-    public string Title { get; }
-    public string Content { get; }
+    private readonly string _title;
+    private readonly string _body;
 
-    public LexiconEntryScreen(string title, string content)
+    public LexiconEntryScreen(string title, string body)
     {
-        Title = title;
-        Content = content;
+        _title = title;
+        _body = body;
     }
 
     public ScreenResult Run(IAnsiConsole console)
     {
-        console.ShowScreenHeader(Title);
-        DisplayFormattedContent(console, Content);
+        console.ShowScreenHeader(_title);
+        DisplayFormattedContent(console, _body);
         console.WriteLine();
         console.WaitForKey();
         return ScreenResult.Pop;

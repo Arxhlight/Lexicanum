@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Lexicanum.Core.Scoring;
 
 /// <summary>
@@ -9,6 +11,7 @@ public class PlayerScore
     public Dictionary<string, int> FeatureScores { get; set; } = new();
     public DateTime DateOfPlaying { get; set; } = DateTime.Now;
 
+    [JsonIgnore]
     public int TotalScore => FeatureScores.Values.Sum();
 
     public void AddScore(string featureId, int points)

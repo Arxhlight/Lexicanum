@@ -9,7 +9,11 @@ namespace Lexicanum.Core.Scoring;
 /// </summary>
 public sealed class JsonScoreStore : IScoreStore
 {
-    private static readonly JsonSerializerOptions SerializerOptions = new() { WriteIndented = true };
+    private static readonly JsonSerializerOptions SerializerOptions = new()
+    {
+        WriteIndented = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
 
     private readonly string _filePath;
 
@@ -28,7 +32,7 @@ public sealed class JsonScoreStore : IScoreStore
         try
         {
             var json = File.ReadAllText(_filePath);
-            var scores = JsonSerializer.Deserialize<List<PlayerScore>>(json) ?? new List<PlayerScore>();
+            var scores = JsonSerializer.Deserialize<List<PlayerScore>>(json, SerializerOptions) ?? new List<PlayerScore>();
             return new ScoreboardLoadResult(scores, LoadFailed: false);
         }
         catch (Exception ex) when (ex is JsonException or IOException or UnauthorizedAccessException)

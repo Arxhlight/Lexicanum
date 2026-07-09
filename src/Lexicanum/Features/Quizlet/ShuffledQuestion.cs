@@ -18,7 +18,7 @@ internal sealed class ShuffledQuestion
         var optionsWithIndices = ShuffleUntilOrderChanges(original.Options, random);
 
         ShuffledOptions = optionsWithIndices.Select(x => x.Option).ToArray();
-        ShuffledCorrectIndex = optionsWithIndices.FindIndex(x => x.OriginalIndex == original.CorrectIndex);
+        ShuffledCorrectIndex = Array.FindIndex(optionsWithIndices, x => x.OriginalIndex == original.CorrectIndex);
     }
 
     public bool CheckAnswer(int answerIndex) => answerIndex == ShuffledCorrectIndex;
@@ -26,28 +26,31 @@ internal sealed class ShuffledQuestion
     public string GetCorrectAnswer() => ShuffledOptions[ShuffledCorrectIndex];
 
     /// <summary>
-    /// Fisher-Yates shuffle, repeated until the result differs from the original order
-    /// so a shuffled question never presents its options unshuffled.
+    /// Shuffles until the result differs from the original order so a shuffled
+    /// question never presents its options exactly as authored.
     /// </summary>
-    private static List<(string Option, int OriginalIndex)> ShuffleUntilOrderChanges(IReadOnlyList<string> options, Random random)
+    private static (string Option, int OriginalIndex)[] ShuffleUntilOrderChanges(IReadOnlyList<string> options, Random random)
     {
-        List<(string Option, int OriginalIndex)> optionsWithIndices;
+        var optionsWithIndices = options
+            .Select((option, index) => (Option: option, OriginalIndex: index))
+            .ToArray();
+
+        if (optionsWithIndices.Length < 2)
+        {
+            return optionsWithIndices;
+        }
 
         do
         {
-            optionsWithIndices = options
-                .Select((opt, idx) => (Option: opt, OriginalIndex: idx))
-                .ToList();
-
-            for (int i = optionsWithIndices.Count - 1; i > 0; i--)
-            {
-                int j = random.Next(i + 1);
-                (optionsWithIndices[i], optionsWithIndices[j]) = (optionsWithIndices[j], optionsWithIndices[i]);
-            }
+            random.Shuffle(optionsWithIndices);
         }
-        while (options.Count > 1 &&
-               optionsWithIndices.Select((x, i) => x.OriginalIndex == i).All(same => same));
+        while (IsOriginalOrder(optionsWithIndices));
 
         return optionsWithIndices;
+    }
+
+    private static bool IsOriginalOrder((string Option, int OriginalIndex)[] optionsWithIndices)
+    {
+        return optionsWithIndices.Select((x, i) => x.OriginalIndex == i).All(same => same);
     }
 }

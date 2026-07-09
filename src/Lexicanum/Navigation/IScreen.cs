@@ -8,6 +8,5 @@ namespace Lexicanum.Navigation;
 /// </summary>
 public interface IScreen
 {
-    string Title { get; }
     ScreenResult Run(IAnsiConsole console);
 }

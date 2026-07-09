@@ -14,8 +14,6 @@ public sealed class MenuScreen : IScreen
     private readonly ScoreService _scoreService;
     private readonly bool _isRoot;
 
-    public string Title => _node.Title;
-
     public MenuScreen(MenuNode node, ScoreService scoreService, bool isRoot = false)
     {
         _node = node;

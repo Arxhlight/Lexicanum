@@ -11,21 +11,17 @@ namespace Lexicanum.Tests;
 /// </summary>
 public sealed class NavigationContractTests : IDisposable
 {
-    private readonly string _tempDirectory;
+    private readonly TempDirectory _tempDirectory = new();
     private readonly string _scoreFilePath;
 
     public NavigationContractTests()
     {
-        _tempDirectory = Path.Combine(Path.GetTempPath(), $"lexicanum-tests-{Guid.NewGuid():N}");
-        _scoreFilePath = Path.Combine(_tempDirectory, "highscores.json");
+        _scoreFilePath = _tempDirectory.FilePath("highscores.json");
     }
 
     public void Dispose()
     {
-        if (Directory.Exists(_tempDirectory))
-        {
-            Directory.Delete(_tempDirectory, recursive: true);
-        }
+        _tempDirectory.Dispose();
     }
 
     [Fact]

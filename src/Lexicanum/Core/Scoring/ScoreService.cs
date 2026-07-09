@@ -42,20 +42,4 @@ public class ScoreService
     {
         return _store.Load();
     }
-
-    public List<PlayerScore> GetTopScores(int count = 10)
-    {
-        return LoadScoreboard().Scores
-            .OrderByDescending(s => s.TotalScore)
-            .Take(count)
-            .ToList();
-    }
-
-    public List<PlayerScore> GetPlayerHistory(string playerName)
-    {
-        return LoadScoreboard().Scores
-            .Where(s => s.PlayerName.Equals(playerName, StringComparison.OrdinalIgnoreCase))
-            .OrderByDescending(s => s.DateOfPlaying)
-            .ToList();
-    }
 }

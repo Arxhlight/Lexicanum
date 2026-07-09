@@ -29,7 +29,7 @@ public sealed class CodeTrainerScreen : IScreen
 
         var hardmode = console.Confirm("Enable Hardmode? (One mistake and you're out)", defaultValue: false);
         var hardmodeOver = false;
-        var sessionScore = 0;
+        var correctAnswers = 0;
 
         console.ShowNarrator(hardmode
             ? "Hardmode activated. No pressure... actually, lots of pressure."
@@ -38,22 +38,25 @@ public sealed class CodeTrainerScreen : IScreen
 
         foreach (var exercise in _pack.Items)
         {
-            if (hardmodeOver)
+            var outcome = RunExercise(console, exercise, hardmode);
+
+            if (outcome == ExerciseOutcome.Correct)
             {
+                correctAnswers++;
+            }
+            else if (outcome == ExerciseOutcome.HardmodeFailed)
+            {
+                hardmodeOver = true;
                 break;
             }
-
-            sessionScore += RunExercise(console, exercise, hardmode, out hardmodeOver);
         }
 
-        ShowSessionResults(console, sessionScore, hardmodeOver);
+        ShowSessionResults(console, correctAnswers * ScoringRules.PointsPerCorrectAnswer, hardmodeOver);
         return ScreenResult.Pop;
     }
 
-    private int RunExercise(IAnsiConsole console, CodeExercise exercise, bool hardmode, out bool hardmodeOver)
+    private ExerciseOutcome RunExercise(IAnsiConsole console, CodeExercise exercise, bool hardmode)
     {
-        hardmodeOver = false;
-
         console.ShowScreenHeader(exercise.Name, _scoreService.GetTotalScore());
         console.MarkupLine($"[{Theme.Body}]{Markup.Escape(exercise.Description)}[/]");
         console.WriteLine();
@@ -76,13 +79,12 @@ public sealed class CodeTrainerScreen : IScreen
             }
 
             console.WaitForKey();
-            return ScoringRules.PointsPerCorrectAnswer;
+            return ExerciseOutcome.Correct;
         }
 
         if (hardmode)
         {
             console.ShowNarrator("WRONG! Hardmode doesn't forgive. Game Over.");
-            hardmodeOver = true;
         }
         else
         {
@@ -92,12 +94,12 @@ public sealed class CodeTrainerScreen : IScreen
         console.ShowInfo(exercise.Feedback);
         ShowCorrectAnswer(console, exercise, userCode);
 
-        if (!hardmodeOver)
+        if (!hardmode)
         {
             console.WaitForKey();
         }
 
-        return 0;
+        return hardmode ? ExerciseOutcome.HardmodeFailed : ExerciseOutcome.Wrong;
     }
 
     private static void ShowCorrectAnswer(IAnsiConsole console, CodeExercise exercise, string userCode)
@@ -154,11 +156,7 @@ public sealed class CodeTrainerScreen : IScreen
 
     public static MenuNode CreateMenuNode(IReadOnlyList<ContentPack<CodeExercise>> exercisePacks, ScoreService scoreService)
     {
-        var languageLeaves = exercisePacks
-            .Select(pack => MenuNode.Leaf(pack.Category, pack.Description,
-                () => new CodeTrainerScreen(pack, scoreService)))
-            .ToArray();
-
-        return MenuNode.Branch("Live Code Training", "Practice writing code in real-time", languageLeaves);
+        return MenuNode.BranchFromPacks("Live Code Training", "Practice writing code in real-time", exercisePacks,
+            pack => new CodeTrainerScreen(pack, scoreService));
     }
 }

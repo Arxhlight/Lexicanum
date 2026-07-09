@@ -1,12 +1,5 @@
 namespace Lexicanum.Navigation;
 
-public enum ScreenAction
-{
-    Push,
-    Pop,
-    Exit
-}
-
 /// <summary>
 /// What the navigator should do after a screen finishes: push a new screen,
 /// pop back to the previous one, or exit the application.
