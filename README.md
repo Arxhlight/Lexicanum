@@ -10,12 +10,10 @@ commands, terminal operations, programming fundamentals, and more.
 ### 🎮 Gamified Learning
 - **Moxy Narrator** - Sarcastic commentary to keep you motivated
 - **Hardmode** - One mistake and you're out (for the brave)
-
 - **Global Score System** - Earn points across all activities
-- 
 - **Leaderboard** - Compete with yourself and your alter egos
 - **Session Tracking** - See your progress breakdown by feature
-- **Persistent High Scores** - Your achievements are saved
+- **Persistent High Scores** - Saved to `%APPDATA%\Lexicanum\highscores.json`, so they survive updates and follow you between sessions
 
 ### 📚 Learning Modules
 
@@ -55,18 +53,28 @@ dotnet run --project src/Lexicanum
 
 1. **Start the application** - You'll be greeted by the Lexicanum narrator
 2. **Enter your name** - Your scores will be tracked
-3. **Choose a module** from the main menu:
+3. **Choose a module** with the arrow keys and Enter (every menu has a `Back` entry, the main menu has `Exit`):
    - `Lexicon` - Browse reference material
    - `Quizlet` - Take quizzes to earn points
    - `Live Code Training` - Practice writing code
    - `Scoreboard` - Check your scores and rankings
 4. **Earn points** - Correct answers add to your global score
-5. **Exit** - Your session score is saved to the leaderboard
+5. **Exit** - Your session score is saved to the leaderboard (Ctrl+C mid-session saves too)
 
 ## Development
 
 Read [CLAUDE.md](CLAUDE.md) (enforced rules, each with its source) and
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) (principles, layer map, how to add a feature) before contributing.
+
+### Quick start
+
+```bash
+dotnet run --project src/Lexicanum
+```
+
+No separate build step - `dotnet run` restores and builds automatically, so this is all you
+need to launch the TUI while developing. Run it from a real terminal: with redirected input
+the app refuses to start (exit code 1), which is intentional.
 
 ### Contributing
 >- Contributors must create new branch on `develop`.
