@@ -20,6 +20,7 @@ public class LexicanumApp
     private readonly IAnsiConsole _console;
     private readonly ApplicationContent _content;
     private readonly ScoreService _scoreService;
+    private int _sessionPersisted;
 
     public LexicanumApp(IAnsiConsole console, ApplicationContent content)
         : this(console, content, new ScoreService(new JsonScoreStore(DefaultScoreFilePath())))
@@ -61,13 +62,24 @@ public class LexicanumApp
     }
 
     /// <summary>
-    /// Ctrl+C handler: persists the session before terminating with a clean exit code.
+    /// Ctrl+C handler: persists the session when there is a score worth keeping,
+    /// then terminates with a clean exit code. Runs on a threadpool thread, so
+    /// saving is guarded to happen at most once per session.
     /// </summary>
     public void HandleInterrupt()
     {
-        SaveScoreSafely();
         _console.WriteLine();
-        _console.ShowNarrator("Fleeing mid-session? Your score is saved. The shame is yours to keep.");
+
+        if (_scoreService.CurrentScore.TotalScore > 0)
+        {
+            SaveScoreSafely();
+            _console.ShowNarrator("Fleeing mid-session? Your score is saved. The shame is yours to keep.");
+        }
+        else
+        {
+            _console.ShowNarrator("Leaving with nothing to show for it? Figures.");
+        }
+
         Environment.Exit(0);
     }
 
@@ -81,6 +93,11 @@ public class LexicanumApp
 
     private void SaveScoreSafely()
     {
+        if (Interlocked.Exchange(ref _sessionPersisted, 1) == 1)
+        {
+            return;
+        }
+
         try
         {
             _scoreService.SaveScore();
@@ -88,6 +105,7 @@ public class LexicanumApp
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             _console.ShowError($"Could not save your score: {ex.Message}");
+            Interlocked.Exchange(ref _sessionPersisted, 0);
         }
     }
 }

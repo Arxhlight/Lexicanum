@@ -9,7 +9,7 @@
       "correctExample": "foreach (var item in myList)\n{\n    // code here\n}",
       "answerPattern": "foreach\\s*\\(\\s*var\\s+\\w+\\s+in\\s+\\w+\\s*\\)",
       "feedback": "Syntax: foreach (var item in collection) - don't forget the 'var', 'in', and parentheses.",
-      "successFeedback": "Tip: always include curly braces, even for one-line bodies."
+      "successFeedback": "Curly braces around the loop body are best practice, even for one-liners."
     },
     {
       "id": "csharp-for-loop",

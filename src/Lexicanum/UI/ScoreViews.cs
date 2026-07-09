@@ -66,16 +66,8 @@ public static class ScoreViews
                 _ => Theme.Body
             };
 
-            var rankDisplay = rank switch
-            {
-                1 => "1st",
-                2 => "2nd",
-                3 => "3rd",
-                _ => $"{rank}th"
-            };
-
             table.AddRow(
-                $"[{rankColor}]{rankDisplay}[/]",
+                $"[{rankColor}]{FormatRankOrdinal(rank)}[/]",
                 $"[{rankColor}]{Markup.Escape(score.PlayerName)}[/]",
                 $"[{rankColor}]{score.TotalScore}[/]",
                 $"[{rankColor}]{score.DateOfPlaying:yyyy-MM-dd HH:mm}[/]");
@@ -83,5 +75,22 @@ public static class ScoreViews
 
         console.Write(table);
         console.WriteLine();
+    }
+
+    private static string FormatRankOrdinal(int rank)
+    {
+        var suffix = (rank % 100) switch
+        {
+            11 or 12 or 13 => "th",
+            _ => (rank % 10) switch
+            {
+                1 => "st",
+                2 => "nd",
+                3 => "rd",
+                _ => "th"
+            }
+        };
+
+        return $"{rank}{suffix}";
     }
 }

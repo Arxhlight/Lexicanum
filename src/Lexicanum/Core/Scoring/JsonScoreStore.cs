@@ -41,9 +41,20 @@ public sealed class JsonScoreStore : IScoreStore
         }
     }
 
+    /// <summary>
+    /// Appends a score to the scoreboard. When the existing file is unreadable it is
+    /// preserved as "<c>.corrupt</c>" instead of being silently replaced.
+    /// </summary>
     public void Append(PlayerScore score)
     {
-        var scores = Load().Scores;
+        var loadResult = Load();
+
+        if (loadResult.LoadFailed)
+        {
+            PreserveUnreadableFile();
+        }
+
+        var scores = loadResult.Scores;
         scores.Add(score);
 
         var json = JsonSerializer.Serialize(scores, SerializerOptions);
@@ -54,8 +65,16 @@ public sealed class JsonScoreStore : IScoreStore
             Directory.CreateDirectory(directory);
         }
 
-        var tempPath = _filePath + ".tmp";
+        var tempPath = $"{_filePath}.{Path.GetRandomFileName()}.tmp";
         File.WriteAllText(tempPath, json);
         File.Move(tempPath, _filePath, overwrite: true);
+    }
+
+    private void PreserveUnreadableFile()
+    {
+        if (File.Exists(_filePath))
+        {
+            File.Move(_filePath, _filePath + ".corrupt", overwrite: true);
+        }
     }
 }

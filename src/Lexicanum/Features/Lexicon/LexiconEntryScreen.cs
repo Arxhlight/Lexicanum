@@ -49,7 +49,7 @@ public sealed class LexiconEntryScreen : IScreen
             }
             else if (line.TrimStart().StartsWith("##", StringComparison.Ordinal))
             {
-                console.Write(new Text(line.Replace("##", "►"), Theme.AccentStyle));
+                console.Write(new Text($"► {line.TrimStart().TrimStart('#').TrimStart()}", Theme.AccentStyle));
             }
             else if (line.TrimStart().StartsWith('-') || line.TrimStart().StartsWith('•'))
             {

@@ -23,6 +23,15 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
+      - name: Restore
+        run: dotnet restore Lexicanum.sln
+
+      - name: Build
+        run: dotnet build Lexicanum.sln --configuration Release --no-restore
+
+      - name: Test the merge commit before publishing
+        run: dotnet test Lexicanum.sln --configuration Release --no-build
+
       - name: Publish single-file executable
         run: >
           dotnet publish src/Lexicanum/Lexicanum.csproj
