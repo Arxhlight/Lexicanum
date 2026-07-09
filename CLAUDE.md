@@ -48,6 +48,24 @@ Architecture principles and the layer map live in [docs/ARCHITECTURE.md](docs/AR
 - **All terminal I/O goes through an injected `IAnsiConsole`.** The static `AnsiConsole` is banned everywhere except `Program.cs`. Shared rendering lives in `UI/ConsoleViews.cs`/`UI/ScoreViews.cs` as extensions over the interface.
   *Enforced by:* review (grep for `AnsiConsole.`). *Source:* [Spectre.Console — testing console output](https://spectreconsole.net/console/how-to/testing-console-output) ("accept `IAnsiConsole` as a parameter").
 - All styling via `Theme` — no inline color names in feature code.
+- **Theme Token Rule:** every piece of text is styled with the token that matches its *purpose*, never a color name and never a neighboring token that happens to look right today. The tokens and their purposes:
+
+  | Token | Purpose |
+  |---|---|
+  | `Accent` | App identity: screen headers, menu highlight, welcome greeting |
+  | `Info` | Informative text: explanations, hints, totals, instructions |
+  | `Narrator` | Moxy's voice: narrator lines, box borders |
+  | `Input` | Everything the player types (via `PromptStyle`) |
+  | `Score` | The running score and score totals |
+  | `CodeBlock` | Code lines inside lexicon pages |
+  | `Success` / `Error` | Correct / wrong outcome messages |
+  | `CorrectAnswer` / `WrongAnswer` | The two sides of code comparisons |
+  | `Body` | Primary reading text: questions, descriptions, page bodies |
+  | `Muted` | De-emphasized chrome: key hints, prompt titles, borders |
+  | `RankGold`/`RankSilver`/`RankBronze` | Top-3 leaderboard rows |
+
+  New features must reuse these tokens (or add a new purpose-named token to `Theme` for a genuinely new purpose). Colors are tuned in `Theme.cs` alone; if the token choice is right, retuning a color can never require touching feature code.
+  *Enforced by:* review (grep feature code for color names). *Source:* mirrors the JS project's theme-token rule.
 - One loop owns the terminal: `ScreenNavigator` over an explicit screen stack. No nested `while` menu loops, no recursion for navigation. State changes only inside a screen's `Run` (MVU-style).
   *Source:* Bubble Tea's Elm architecture ([tutorial](https://github.com/charmbracelet/bubbletea/blob/main/tutorials/basics/README.md)), Terminal.Gui's Application loop.
 - CLI etiquette: `Main` returns an exit code (0 success, 1 not-a-terminal, 2 invalid content); no prompts when stdin is redirected; Ctrl+C saves the session and exits 0. Spectre handles `NO_COLOR` and capability detection — never override it.

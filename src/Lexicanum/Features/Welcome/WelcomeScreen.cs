@@ -42,7 +42,7 @@ public class WelcomeScreen
     public void Show()
     {
         _console.Clear();
-        _console.Write(new Text(AsciiArt, Theme.NarratorStyle));
+        _console.Write(new Text(AsciiArt, Theme.AccentStyle));
         _console.WriteLine();
         _console.ShowNarrator(MoxyMessages[Random.Shared.Next(MoxyMessages.Length)]);
         _console.WriteLine();
@@ -52,6 +52,7 @@ public class WelcomeScreen
     {
         var name = _console.Prompt(
             new TextPrompt<string>($"[{Theme.Narrator}]>> State your name, seeker of knowledge:[/]")
+                .PromptStyle(Theme.InputStyle)
                 .AllowEmpty());
 
         if (string.IsNullOrWhiteSpace(name))

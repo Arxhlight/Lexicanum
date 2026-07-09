@@ -39,7 +39,7 @@ public static class ConsoleViews
 
     public static void ShowInfo(this IAnsiConsole console, string message)
     {
-        console.MarkupLine($"[{Theme.Accent}]{Markup.Escape(message)}[/]");
+        console.MarkupLine($"[{Theme.Info}]{Markup.Escape(message)}[/]");
     }
 
     public static void ShowBox(this IAnsiConsole console, string title, string content)
@@ -93,7 +93,9 @@ public static class ConsoleViews
 
         while (true)
         {
-            var line = console.Prompt(new TextPrompt<string>($"[{Theme.Muted}]>[/]").AllowEmpty());
+            var line = console.Prompt(new TextPrompt<string>($"[{Theme.Muted}]>[/]")
+                .PromptStyle(Theme.InputStyle)
+                .AllowEmpty());
 
             if (string.IsNullOrWhiteSpace(line))
             {
