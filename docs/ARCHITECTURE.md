@@ -18,10 +18,12 @@ Directory.Build.props      Shared build/analyzer configuration
 .editorconfig              Style and naming rules
 docs/ARCHITECTURE.md       This file
 src/Lexicanum/
-├── Program.cs             Composition root ONLY: wiring + lifecycle
+├── Program.cs             Entry point: content load, exit codes, Ctrl+C hookup
+├── LexicanumApp.cs        Composition root: wiring + lifecycle
 ├── Content/               Embedded JSON: lexicon/, quizzes/, exercises/
 ├── Core/                  Zero UI references
-│   ├── Content/           Content records, EmbeddedContentSource, ContentValidator
+│   ├── Content/           Content records, ApplicationContent,
+│   │                      EmbeddedContentSource, ContentValidator
 │   └── Scoring/           PlayerScore, ScoreService, IScoreStore/JsonScoreStore,
 │                          ScoringRules, FeatureIds
 ├── Navigation/            IScreen, ScreenResult, ScreenNavigator, MenuNode, MenuScreen
@@ -60,7 +62,7 @@ Why not the old recursive walker: recursion entangles navigation depth with the 
 
 ## Application Lifecycle
 
-`Program.Main`: load + validate content (exit 2 on failure) → refuse redirected stdin (exit 1) → wire `LexicanumApp` → register Ctrl+C handler (save score, exit 0) → run. `LexicanumApp.Run`: welcome → build the root `MenuNode` from content → navigator loop → save score → farewell summary.
+`Program.Main`: load + validate content (exit 2 on failure) → refuse redirected stdin (exit 1) → wire `LexicanumApp` → register Ctrl+C handler (save once if there is a score, exit 0) → run. `LexicanumApp.Run`: welcome → build the root `MenuNode` from content → navigator loop → save score (once per session) → farewell summary.
 
 ## Testing Strategy
 
