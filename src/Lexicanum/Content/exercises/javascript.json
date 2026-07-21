@@ -1,0 +1,22 @@
+{
+  "category": "JavaScript",
+  "description": "Practice JavaScript syntax and patterns",
+  "items": [
+    {
+      "id": "js-foreach",
+      "name": "forEach Method",
+      "description": "Write a forEach that iterates over an array.",
+      "correctExample": "myArray.forEach(item => {\n    // code here\n});",
+      "answerPattern": "\\w+\\.forEach\\s*\\(\\s*\\w+\\s*=>",
+      "feedback": "Syntax: array.forEach(item => { ... });"
+    },
+    {
+      "id": "js-arrow-function",
+      "name": "Arrow Function",
+      "description": "Write an arrow function that takes a parameter and returns it * 2.",
+      "correctExample": "const double = x => x * 2;",
+      "answerPattern": "(const|let|var)\\s+\\w+\\s*=\\s*\\w+\\s*=>\\s*\\w+\\s*\\*\\s*2",
+      "feedback": "Syntax: const name = x => x * 2;"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+    "category":  "Git LFS Commands",
+    "description":  "Large File Storage commands",
+    "items":  [
+                  {
+                      "id":  "lfs-inspection",
+                      "title":  "LFS Inspection",
+                      "description":  "Inspect LFS tracked files",
+                      "body":  "## LFS Inspection\n\nCommands to inspect and manage LFS tracked files.\n\n## Check LFS\n```\ngit lfs version              # Check if Git LFS is installed\ngit lfs ls-files             # List all LFS-tracked files\ngit lfs track                # Show current LFS tracking rules\n```\n\n## Untrack Files\n```\ngit lfs untrack \"*.ext\"      # Stop tracking file pattern\n```"
+                  },
+                  {
+                      "id":  "lfs-in-submodules",
+                      "title":  "LFS in Submodules",
+                      "description":  "LFS commands for submodules",
+                      "body":  "## LFS in Submodules\n\nGit LFS commands for submodules.\n\n## Fetch \u0026 Checkout\n```\ngit -C \u003csubmodule\u003e lfs fetch --all    # Download all LFS files\ngit -C \u003csubmodule\u003e lfs checkout       # Replace pointers with actual files\n```\n\n## Disable LFS\n```\ngit -C \u003csubmodule\u003e lfs uninstall --local # Disable LFS in submodule\n```"
+                  }
+              ]
+}

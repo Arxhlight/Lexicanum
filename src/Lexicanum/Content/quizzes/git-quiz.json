@@ -1,0 +1,27 @@
+{
+  "category": "Git Quiz",
+  "description": "Test your Git knowledge",
+  "items": [
+    {
+      "id": "git-init",
+      "question": "What command is used to create a new Git repository?",
+      "options": ["git new", "git init", "git create", "git start"],
+      "correctIndex": 1,
+      "explanation": "git init initializes a new Git repository in the current directory."
+    },
+    {
+      "id": "git-stage-all",
+      "question": "Which command stages all changes for commit?",
+      "options": ["git commit -a", "git add .", "git stage all", "git push"],
+      "correctIndex": 1,
+      "explanation": "git add . stages all changes in the current directory and subdirectories."
+    },
+    {
+      "id": "git-create-switch-branch",
+      "question": "How do you create and switch to a new branch in one command?",
+      "options": ["git branch new-branch", "git switch new-branch", "git checkout -b new-branch", "git new-branch"],
+      "correctIndex": 2,
+      "explanation": "git checkout -b creates a new branch and switches to it. Modern alternative: git switch -c"
+    }
+  ]
+}

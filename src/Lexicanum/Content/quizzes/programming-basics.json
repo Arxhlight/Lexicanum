@@ -1,0 +1,20 @@
+{
+  "category": "Programming Basics Quiz",
+  "description": "Test your programming fundamentals",
+  "items": [
+    {
+      "id": "oop-meaning",
+      "question": "What does OOP stand for?",
+      "options": ["Object-Oriented Programming", "Open-Oriented Protocol", "Objective Operation Process", "Optional Object Pattern"],
+      "correctIndex": 0,
+      "explanation": "OOP stands for Object-Oriented Programming, a programming paradigm based on objects."
+    },
+    {
+      "id": "array-access-complexity",
+      "question": "What is the time complexity of accessing an element in an array by index?",
+      "options": ["O(n)", "O(log n)", "O(1)", "O(n²)"],
+      "correctIndex": 2,
+      "explanation": "Array access by index is O(1) - constant time, as it's a direct memory offset calculation."
+    }
+  ]
+}

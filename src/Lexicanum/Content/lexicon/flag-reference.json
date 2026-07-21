@@ -1,0 +1,12 @@
+{
+    "category":  "Flag Reference",
+    "description":  "Common command flags explained",
+    "items":  [
+                  {
+                      "id":  "common-flags",
+                      "title":  "Common Flags",
+                      "description":  "Common command line flags and their meanings",
+                      "body":  "## Flag Reference\n\nCommon command line flags and their meanings.\n\n## Branch Flags\n```\n-b                           # Create new branch\n-d                           # Delete branch (safe)\n-D                           # Force delete branch\n```\n\n## Remote \u0026 Tracking\n```\n-u                           # Set upstream tracking\n-a                           # All (context-dependent: branches, files)\n-r                           # Recursive operation\n-C \u003cpath\u003e                    # Run command in specified directory\n```\n\n## Force \u0026 Safety\n```\n--force                      # Override safety checks (DANGEROUS)\n--force-with-lease           # Safer force push\n```\n\n## Index \u0026 Staging\n```\n--cached                     # Operate on index only\n--staged                     # Operate on staged files\n```\n\n## Repository Scope\n```\n--local                      # Local repository scope only\n--recursive                  # Include nested repositories\n--init                       # Initialize repository or submodule\n```\n\n## Merge \u0026 Rebase\n```\n--squash                     # Combine commits into single commit\n--rebase                     # Reapply commits on new base\n```\n\n## Operation Control\n```\n--continue                   # Resume paused operation\n--abort                      # Cancel operation and restore state\n--skip                       # Skip current step in operation\n```"
+                  }
+              ]
+}

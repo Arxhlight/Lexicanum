@@ -1,0 +1,60 @@
+{
+    "category":  "Git Commands",
+    "description":  "Version control commands and workflows",
+    "items":  [
+                  {
+                      "id":  "repository-inspection",
+                      "title":  "Repository Inspection",
+                      "description":  "Inspect repository state",
+                      "body":  "## Repository Inspection\n\nCommands to inspect repository state and history.\n\n## Status \u0026 Diff\n```\ngit status                   # Show branch and working tree status\ngit diff                     # Show unstaged changes\ngit diff --staged            # Show staged changes ready to commit\n```\n\n## History\n```\ngit log --oneline            # Display compact commit history\ngit log --graph --oneline --all  # Visual branch graph\ngit show \u003ccommit-hash\u003e       # Show details of specific commit\ngit show HEAD                # Show details of latest commit\n```\n\n## Branches \u0026 Remotes\n```\ngit branch                   # List local branches\ngit branch -r                # List remote branches only\ngit branch -a                # List all branches (local and remote)\ngit remote -v                # Show remote repository URLs\n```"
+                  },
+                  {
+                      "id":  "staging-committing",
+                      "title":  "Staging \u0026 Committing",
+                      "description":  "Stage and commit changes",
+                      "body":  "## Staging \u0026 Committing\n\nStage changes and create commits.\n\n## Staging Files\n```\ngit add \u003cfile\u003e               # Stage specific file for commit\ngit add .                    # Stage all changes in current directory\ngit add -p                   # Interactive staging (choose hunks)\n```\n\n## Unstaging Files\n```\ngit reset \u003cfile\u003e             # Unstage file but keep changes (classic)\ngit reset HEAD \u003cfile\u003e        # Same as above, explicit HEAD\ngit restore --staged \u003cfile\u003e  # Modern way to unstage file\ngit restore --staged .       # Unstage all staged files\n```\n\n## Committing\n```\ngit commit -m \"message\"      # Create commit with message\ngit commit -am \"message\"     # Add tracked files and commit in one step\ngit commit --amend           # Modify last commit (message or content)\n```\n\n## Best Practices\n- Write clear, descriptive commit messages\n- Keep commits atomic (one logical change per commit)\n- Use present tense in commit messages"
+                  },
+                  {
+                      "id":  "working-directory-changes",
+                      "title":  "Working Directory Changes",
+                      "description":  "Manage uncommitted changes",
+                      "body":  "## Working Directory Changes\n\nManage uncommitted changes in your working directory.\n\n## Discard Changes\n```\ngit restore \u003cfile\u003e           # Discard changes to specific file (DANGEROUS)\ngit restore .                # Discard all unstaged changes (DANGEROUS)\n```\n\n## Compare Changes\n```\ngit diff HEAD~1              # Compare current state with previous commit\n```\n\n⚠️ WARNING: git restore permanently discards changes!"
+                  },
+                  {
+                      "id":  "branch-management",
+                      "title":  "Branch Management",
+                      "description":  "Create, switch, and delete branches",
+                      "body":  "## Branch Management\n\nCreate, switch, and delete branches.\n\n## Switch Branches\n```\ngit checkout \u003cbranch\u003e        # Switch to existing branch (classic)\ngit switch \u003cbranch\u003e          # Switch to existing branch (modern)\n```\n\n## Create Branches\n```\ngit checkout -b \u003cnew-branch\u003e # Create and switch to new branch\ngit checkout -b \u003cnew\u003e \u003csource\u003e # Create new branch from source branch\ngit switch -c \u003cnew-branch\u003e   # Create and switch (modern)\n```\n\n## Delete Branches\n```\ngit branch -d \u003cbranch\u003e       # Delete local branch (safe)\ngit branch -D \u003cbranch\u003e       # Force delete local branch\n```\n\n## Rename Branch\n```\ngit branch -m \u003cold\u003e \u003cnew\u003e    # Rename branch\ngit branch -m \u003cnew-name\u003e     # Rename current branch\n```"
+                  },
+                  {
+                      "id":  "merging",
+                      "title":  "Merging",
+                      "description":  "Merge branches together",
+                      "body":  "## Merging\n\nMerge branches together.\n\n## Basic Merge\n```\ngit merge \u003cbranch\u003e           # Merge specified branch into current branch\ngit merge --no-ff \u003cbranch\u003e   # Merge with explicit merge commit\n```\n\n## Squash Merge\n```\ngit merge --squash \u003cbranch\u003e  # Squash all commits into single commit\n```\n\n## After Squash Merge\n```\ngit commit -m \"message\"      # Complete squash merge with commit\n```"
+                  },
+                  {
+                      "id":  "rebasing",
+                      "title":  "Rebasing",
+                      "description":  "Rebase commits onto another branch",
+                      "body":  "## Rebasing\n\nRebase commits onto another branch.\n\n## Basic Rebase\n```\ngit rebase \u003cbase-branch\u003e     # Replay current branch commits onto base\ngit rebase \u003cbase\u003e \u003cbranch\u003e   # Rebase branch onto base (not on branch)\n```\n\n## Rebase Control\n```\ngit rebase --continue        # Continue after resolving conflicts\ngit rebase --abort           # Cancel rebase and restore original state\ngit rebase --skip            # Skip current conflicting commit\n```\n\n⚠️ CAUTION: Rebasing rewrites commit history!"
+                  },
+                  {
+                      "id":  "remote-operations",
+                      "title":  "Remote Operations",
+                      "description":  "Push, pull, and fetch",
+                      "body":  "## Remote Operations\n\nPush, pull, and fetch from remotes.\n\n## Push\n```\ngit push                     # Push to configured upstream branch\ngit push origin \u003cbranch\u003e     # Push specific branch to origin\ngit push -u origin \u003cbranch\u003e  # Push and set upstream tracking\ngit push --force-with-lease  # Safe force push after rebase\n```\n\n## Fetch\n```\ngit fetch                    # Download remote refs without merging\ngit fetch origin             # Update references from origin remote\n```"
+                  },
+                  {
+                      "id":  "submodule-commands",
+                      "title":  "Submodule Commands",
+                      "description":  "Everyday submodule operations",
+                      "body":  "## Submodule Commands\n\nManage Git submodules.\n\n## Cloning with Submodules\n```\ngit clone --recurse-submodules \u003crepo-url\u003e   # Clone repo and all submodules\n```\n\n## Initialize After Clone\nIf you already cloned without --recurse-submodules:\n```\ngit submodule update --init --recursive     # Initialize all submodules\n```\n\n## Add Submodule\n```\ngit submodule add \u003crepo-url\u003e \u003cpath\u003e        # Add submodule to repository\ngit submodule add -b \u003cbranch\u003e \u003crepo\u003e \u003cpath\u003e # Add submodule tracking specific branch\n```\n\n## Initialize \u0026 Update\n```\ngit submodule init                         # Initialize submodules from .gitmodules\ngit submodule status                       # Show submodule commit status\ngit submodule update                       # Checkout recorded commit\ngit submodule update --init                # Clone and initialize submodules\ngit submodule update --init --recursive    # Initialize nested submodules\ngit submodule update --remote              # Update to latest commit from remote\n```\n\n## Remove Submodule\n```\ngit submodule deinit \u003cpath\u003e                # Remove submodule working tree\ngit submodule deinit -f \u003cpath\u003e             # Force remove (discard local changes)\ngit rm \u003cpath\u003e                              # Remove submodule from repository\n```\n\n## Batch Operations\n```\ngit submodule foreach \u0027\u003ccommand\u003e\u0027          # Run command in each submodule\ngit submodule foreach --recursive \u0027\u003ccmd\u003e\u0027  # Run in all nested submodules\ngit submodule sync                         # Sync URLs from .gitmodules\ngit submodule sync --recursive             # Sync all nested submodules\n```\n\n## Configuration\n```\ngit submodule set-branch --branch \u003cbranch\u003e \u003cpath\u003e  # Change tracked branch\ngit submodule set-branch --default \u003cpath\u003e  # Use default branch\ngit submodule set-url \u003cpath\u003e \u003cnewurl\u003e      # Change submodule URL\n```\n\n## Commands in Submodule\n```\ngit -C \u003cpath\u003e status                       # Run git command in submodule directory\ngit -C \u003cpath\u003e commit -m \\\"msg\\\"              # Commit inside submodule\ngit -C \u003cpath\u003e lfs fetch                    # Fetch LFS files in submodule\n```"
+                  },
+                  {
+                      "id":  "submodule-status-symbols",
+                      "title":  "Submodule Status Symbols",
+                      "description":  "Reading submodule status output",
+                      "body":  "## Submodule Status Symbols\n\nUnderstanding submodule status output.\n\n## Status Symbols\n```\n-\u003ccommit\u003e                    # Submodule registered but not cloned\n \u003ccommit\u003e                    # Submodule correct and initialized\n+\u003ccommit\u003e                    # Submodule at wrong commit\nU\u003ccommit\u003e                    # Submodule has merge conflict\n```\n\n## Example\n```\n$ git submodule status\n-abc1234 path/to/submodule   # Not yet cloned\n def5678 another/submodule   # Correct state\n+ghi9012 third/submodule     # Wrong commit checked out\n```"
+                  }
+              ]
+}
