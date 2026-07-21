@@ -1,0 +1,12 @@
+{
+    "category":  "Safety Warnings",
+    "description":  "Dangerous commands to use with caution",
+    "items":  [
+                  {
+                      "id":  "dangerous-commands",
+                      "title":  "Dangerous Commands",
+                      "description":  "Commands that can cause data loss",
+                      "body":  "## Safety Warnings\n\n⚠️ These commands can cause data loss. Use with caution!\n\n## DANGER: Permanent Data Loss\n```\ngit restore .                # Permanently discards local changes\ngit rm -rf                   # Permanently deletes files\ngit push --force             # Can overwrite others\u0027 work\n```\n\n## CAUTION: History Rewriting\n```\ngit rebase                   # Rewrites commit history\n```\n\n## SAFER Alternatives\n```\ngit push --force-with-lease  # Checks remote state first\ngit stash                    # Temporarily save changes instead of discard\n```\n\n## Before Using Dangerous Commands\n1. Make sure you have a backup or the changes are committed elsewhere\n2. Double-check you\u0027re on the right branch\n3. Verify what will be affected with --dry-run when available\n4. Consider if there\u0027s a safer alternative"
+                  }
+              ]
+}
