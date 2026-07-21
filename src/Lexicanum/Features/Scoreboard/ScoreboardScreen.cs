@@ -54,6 +54,7 @@ public sealed class ScoreboardScreen : IScreen
         if (scoreboard.LoadFailed)
         {
             console.ShowError("Existing highscores could not be read; showing a fresh scoreboard.");
+            console.MarkupLine("[dim]Complete a session and exit to fix the corrupted file.[/]");
         }
 
         console.ShowScoreboard(query(scoreboard.Scores).ToList());
